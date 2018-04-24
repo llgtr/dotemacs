@@ -1,35 +1,8 @@
 ;;; -*- lexical-binding: t -*-
 
-(defun shorten-directory (dir max-length)
-  "Show up to `max-length' characters of a directory name `dir'."
-  (let ((path (reverse (split-string (abbreviate-file-name dir) "/")))
-               (output ""))
-       (when (and path (equal "" (car path)))
-         (setq path (cdr path)))
-       (while (and path (< (length output) (- max-length 4)))
-         (setq output (concat (car path) "/" output))
-         (setq path (cdr path)))
-       (when path
-         (setq output (concat ".../" output)))
-       output))
-
-(defvar mode-line-directory
-  '(:propertize
-    (:eval (if (buffer-file-name)
-               (concat " " (shorten-directory default-directory 20)) " "))
-                face mode-line-directory)
-  "Formats the current directory.")
-(put 'mode-line-directory 'risky-local-variable t)
-
 ;; Override default value (%12b)
 (setq-default mode-line-buffer-identification
   (propertized-buffer-identification "%b"))
-
-(defun simple-mode-line-render (left right)
-  "Return a string of `window-total-width' length containing LEFT, and RIGHT
- aligned respectively."
-  (let* ((available-width (- (window-total-width) (length left) 2)))
-    (format (format " %%s %%%ds " available-width) left right)))
 
 (set-face-attribute 'mode-line nil :foreground "#393939" :background "#515151" :weight 'ultra-bold)
 (set-face-attribute 'mode-line-buffer-id nil :foreground "#99cc99")
@@ -60,30 +33,95 @@
   :group 'mode-line-faces
   :group 'basic-faces)
 
+(defun simple-mode-line-render (left right)
+  "Return a string of `window-total-width' length containing LEFT, and RIGHT
+ aligned respectively."
+  (let* ((available-width (- (window-total-width) (length left) 2)))
+    (format (format " %%s %%%ds " available-width) left right)))
+
+(defun shorten-directory (dir max-length)
+  "Show up to `max-length' characters of a directory name `dir'."
+  (let ((path (reverse (split-string (abbreviate-file-name dir) "/")))
+               (output ""))
+       (when (and path (equal "" (car path)))
+         (setq path (cdr path)))
+       (while (and path (< (length output) (- max-length 4)))
+         (setq output (concat (car path) "/" output))
+         (setq path (cdr path)))
+       (when path
+         (setq output (concat ".../" output)))
+       output))
+
+(defun mode-line-directory ()
+  (if (buffer-file-name)
+      (concat " " (shorten-directory default-directory 20)) " "))
+
+
+;; The functions below are heavily borrowed from doom-emacs
+
+(defun buffer-info ()
+  "Show info about current buffer's state"
+  (cond (buffer-read-only
+                  "")
+                 ((buffer-modified-p)
+                  "*")
+                 ((and buffer-file-name
+                       (not (file-exists-p buffer-file-name)))
+                  "∅")
+                 ("-")))
+
+(defun eol-info ()
+  "Show info about encoding and line endings"
+  (concat " "
+          (if (memq
+               (plist-get (coding-system-plist buffer-file-coding-system) :category)
+               '(coding-category-undecided coding-category-utf-8))
+              "U")
+          " "
+          (pcase (coding-system-eol-type buffer-file-coding-system)
+            (0 "LF")
+            (1 "CRLF")
+            (2 "CR"))))
+
+;; This accommodates git only
+(defun vc-info ()
+  "Show vc state"
+  (let ((state (vc-state buffer-file-name (vc-backend buffer-file-name))))
+    (concat
+     " "
+     (substring vc-mode 5)
+     " "
+     (if (memq state '(edited added)) "(*)" "(-)"))))
+
+(defun flycheck-error-info ()
+  "Show Flycheck's state"
+    (pcase flycheck-last-status-change
+      ('finished (if flycheck-current-errors
+                     (let-alist (flycheck-count-errors flycheck-current-errors)
+                       (let ((sum (+ (or .error 0) (or .warning 0))))
+                         (number-to-string sum)))
+                   "✔"))
+      ('running "⚡")
+      ('no-checker "∅")
+      ('errored "✘")
+      ('interrupted "‽")))
+
 (setq-default
  mode-line-format
- '((:eval (simple-mode-line-render
-           (concat (format-mode-line
-                    (upcase (prin1-to-string evil-state)) "mode-line-accent1")
-                   " |"
-                   (format-mode-line vc-mode "mode-line-accent2")
-                   " |"
-                   (format-mode-line minor-mode-alist "mode-line-basic")
-                   " | "
-                   (format-mode-line
-                    (mapconcat 'format-mode-line
-                               '(mode-line-mule-info
-                                 mode-line-modified
-                                 mode-line-remote) "") "mode-line-basic")
-                   " |"
-                   (mapconcat 'format-mode-line
-                              '(mode-line-directory
-                                mode-line-buffer-identification) ""))
-           (concat (format-mode-line
-                    mode-name "mode-line-accent2")
-                   " | "
-                   (format-mode-line
-                    (format-mode-line "%l:%c ")
-                    "mode-line-accent1"))))))
+ (list '(:eval (simple-mode-line-render
+                (concat (format-mode-line (upcase (prin1-to-string evil-state)) "mode-line-accent1")
+                        " |"
+                        (if vc-mode (concat (format-mode-line (vc-info) "mode-line-accent2") " |"))
+                        (format-mode-line (eol-info) "mode-line-basic")
+                        " "
+                        (format-mode-line (buffer-info) "mode-line-basic")
+                        " |"
+                        (format-mode-line (mode-line-directory) "mode-line-directory")
+                        (format-mode-line 'mode-line-buffer-identification))
+                (concat (when (boundp 'flycheck-last-status-change)
+                          (concat (format-mode-line (flycheck-error-info) "mode-line-basic") " | "))
+                        (format-mode-line 'mode-name "mode-line-accent2")
+                        " | "
+                        (format-mode-line "%l:%c " "mode-line-accent1"))))))
 
 (provide 'init-mode-line)
