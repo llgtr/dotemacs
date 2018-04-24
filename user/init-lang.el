@@ -3,7 +3,8 @@
 ;; General
 (use-package flycheck
   :load-path "lock/flycheck"
-  :defer 5)
+  :commands flycheck-mode
+  :init (setq flycheck-mode-line-prefix "F"))
 
 ;; Rust
 (use-package rust-mode
@@ -14,9 +15,8 @@
 (use-package flycheck-rust
   :load-path "lock/flycheck-rust"
   :after rust-mode
-  :config
-  (add-hook 'rust-mode-hook #'flycheck-mode)
-  (add-hook 'rust-mode-hook #'flycheck-rust-setup))
+  :hook ((rust-mode . flycheck-mode)
+         (rust-mode . flycheck-rust-setup)))
 
 ;; Clojure
 (use-package clojure-mode
@@ -27,8 +27,9 @@
 
 (use-package rainbow-delimiters
   :load-path "lock/rainbow-delimiters"
-  :after clojure-mode
-  :config (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode))
+  :after (:any clojure-mode lisp-mode)
+  :hook ((clojure-mode . rainbow-delimiters-mode)
+         (emacs-lisp-mode . rainbow-delimiters-mode)))
 
 (use-package cider
   :load-path "lock/cider"
@@ -38,14 +39,13 @@
 (use-package haskell-mode
   :load-path "lock/haskell-mode"
   :mode ("\\.hs\\'" . haskell-mode)
-  :config (add-hook 'haskell-mode-hook #'interactive-haskell-mode))
+  :hook (haskell-mode . interactive-haskell-mode))
 
 (use-package flycheck-haskell
   :load-path "lock/flycheck-haskell"
   :after haskell-mode
-  :config
-  (add-hook 'haskell-mode-hook #'flycheck-mode)
-  (add-hook 'haskell-mode-hook #'flycheck-haskell-setup))
+  :hook ((haskell-mode . flycheck-mode)
+         (haskell-mode . flycheck-haskell-setup)))
 
 (use-package web-mode
   :load-path "lock/web-mode"
