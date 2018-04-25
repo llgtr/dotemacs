@@ -67,7 +67,7 @@
                   "*")
                  ((and buffer-file-name
                        (not (file-exists-p buffer-file-name)))
-                  "∅")
+                  "∄")
                  ("-")))
 
 (defun eol-info ()
@@ -76,12 +76,13 @@
           (if (memq
                (plist-get (coding-system-plist buffer-file-coding-system) :category)
                '(coding-category-undecided coding-category-utf-8))
-              "U")
+              "U" "∅")
           " "
           (pcase (coding-system-eol-type buffer-file-coding-system)
             (0 "LF")
             (1 "CRLF")
-            (2 "CR"))))
+            (2 "CR")
+            (_ "N/A"))))
 
 ;; This accommodates git only
 (defun vc-info ()
@@ -91,7 +92,7 @@
      " "
      (substring vc-mode 5)
      " "
-     (if (memq state '(edited added)) "(*)" "(-)"))))
+     (if (memq state '(edited added)) "✔" "✘"))))
 
 (defun flycheck-error-info ()
   "Show Flycheck's state"
@@ -101,10 +102,10 @@
                        (let ((sum (+ (or .error 0) (or .warning 0))))
                          (number-to-string sum)))
                    "✔"))
-      ('running "⚡")
+      ('running "~")
       ('no-checker "∅")
       ('errored "✘")
-      ('interrupted "‽")))
+      ('interrupted "!")))
 
 (setq-default
  mode-line-format
