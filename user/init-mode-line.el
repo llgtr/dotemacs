@@ -4,40 +4,49 @@
 (setq-default mode-line-buffer-identification
   (propertized-buffer-identification "%b"))
 
-(set-face-attribute 'mode-line nil :foreground "#393939" :background "#515151" :weight 'ultra-bold)
-(set-face-attribute 'mode-line-buffer-id nil :foreground "#99cc99")
-(set-face-attribute 'mode-line-highlight nil :box nil :foreground "#bb77bb")
-(set-face-attribute 'mode-line-inactive  nil :inherit 'default)
+;; Color scheme: base16-eighties by Chris Kempson
+;; reference:
+;; base00: #2d2d2d
+;; base01: #393939
+;; base02: #515151
+;; base03: #747369
+;; base04: #a09f93
+;; base05: #d3d0c8
+;; base06: #e8e6df
+;; base07: #f2f0ec
+;; base08: #f2777a
+;; base09: #f99157
+;; base0A: #ffcc66
+;; base0B: #99cc99
+;; base0C: #66cccc
+;; base0D: #6699cc
+;; base0E: #cc99cc
+;; base0F: #d27b53
 
-(defface mode-line-directory
-  '((t :foreground "#99cc99" :weight light))
+
+(set-face-attribute 'mode-line nil
+                    :foreground "#a09f93"
+                    :background "#515151"
+                    :weight 'light)
+
+(set-face-attribute 'mode-line-inactive  nil
+                    :background "#2d2d2d"
+                    :foreground "#515151"
+                    :box '(:line-width 1 :color "#515151")
+                    :inherit 'default)
+
+(set-face-attribute 'mode-line-buffer-id nil
+                    :foreground "#d3d0c8"
+                    :weight 'ultra-bold)
+
+(set-face-attribute 'mode-line-highlight nil
+                    :foreground "#e8e6df")
+
+(defface mode-line-bold
+  '((t :weight ultra-bold))
   ""
   :group 'mode-line-faces
   :group 'basic-faces)
-
-(defface mode-line-basic
-  '((t :foreground "#f99157" :weight normal))
-  ""
-  :group 'mode-line-faces
-  :group 'basic-faces)
-
-(defface mode-line-accent1
-  '((t :foreground "#ffcc66" :weight bold))
-  ""
-  :group 'mode-line-faces
-  :group 'basic-faces)
-
-(defface mode-line-accent2
-  '((t :foreground "#6699cc" :weight normal))
-  ""
-  :group 'mode-line-faces
-  :group 'basic-faces)
-
-(defun simple-mode-line-render (left right)
-  "Return a string of `window-total-width' length containing LEFT, and RIGHT
- aligned respectively."
-  (let* ((available-width (- (window-total-width) (length left) 2)))
-    (format (format " %%s %%%ds " available-width) left right)))
 
 (defun shorten-directory (dir max-length)
   "Show up to `max-length' characters of a directory name `dir'."
@@ -55,7 +64,6 @@
 (defun mode-line-directory ()
   (if (buffer-file-name)
       (concat " " (shorten-directory default-directory 20)) " "))
-
 
 ;; The functions below are heavily borrowed from doom-emacs
 
@@ -109,20 +117,21 @@
 
 (setq-default
  mode-line-format
- (list '(:eval (simple-mode-line-render
-                (concat (format-mode-line (upcase (prin1-to-string evil-state)) "mode-line-accent1")
-                        " |"
-                        (if vc-mode (concat (format-mode-line (vc-info) "mode-line-accent2") " |"))
-                        (format-mode-line (eol-info) "mode-line-basic")
-                        " "
-                        (format-mode-line (buffer-info) "mode-line-basic")
-                        " |"
-                        (format-mode-line (mode-line-directory) "mode-line-directory")
-                        (format-mode-line 'mode-line-buffer-identification))
-                (concat (when (boundp 'flycheck-last-status-change)
-                          (concat (format-mode-line (flycheck-error-info) "mode-line-basic") " | "))
-                        (format-mode-line 'mode-name "mode-line-accent2")
-                        " | "
-                        (format-mode-line "%l:%c " "mode-line-accent1"))))))
+ (list '(:eval (concat " "
+                       (format-mode-line (upcase (prin1-to-string evil-state)) "mode-line-bold")
+                       " |"
+                       (if vc-mode (concat (vc-info) " |"))
+                       (eol-info)
+                       " "
+                       (buffer-info)
+                       " |"
+                       (mode-line-directory)
+                       (format-mode-line 'mode-line-buffer-identification)
+                       " | "
+                       mode-name
+                       " | "
+                       (format-mode-line "%l:%c ")
+                       (when (boundp 'flycheck-last-status-change)
+                         (concat "| " (flycheck-error-info)))))))
 
 (provide 'init-mode-line)
