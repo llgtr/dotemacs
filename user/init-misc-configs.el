@@ -52,7 +52,7 @@
 ;; Padding for linum
 (defun linum-format-func (line)
   (let ((w (length (number-to-string (count-lines (point-min) (point-max))))))
-    (propertize (format (format "%%%dd " w) line) 'face 'linum)))
+    (propertize (format (format " %%%dd " w) line) 'face 'linum)))
 (setq linum-format 'linum-format-func)
 
 ;; Familiar behaviour for alt-keys
