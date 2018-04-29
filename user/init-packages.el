@@ -44,6 +44,21 @@
   :config
   (load-theme 'base16-eighties t))
 
+(use-package ivy
+  :load-path "lock/ivy"
+  :config
+  (ivy-mode 1)
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-height 5)
+  (defun ivy-format-function-default (cands)
+    "Transforms CANDS into a string for minibuffer."
+    (ivy--format-function-generic
+     (lambda (str)
+       (ivy--add-face str 'ivy-current-match))
+     #'identity
+     cands
+     " ")))
+
 (use-package smartparens
   :load-path "lock/smartparens"
   :config
