@@ -31,6 +31,14 @@
   :load-path "pkgs/evil/lib"
   :demand t)
 
+(use-package f
+  :load-path "lib/f"
+  :defer t)
+
+(use-package s
+  :load-path "lib/s"
+  :defer t)
+
 ;; Packages
 (use-package evil
   :load-path "pkgs/evil"

@@ -47,6 +47,11 @@
   :hook ((haskell-mode . flycheck-mode)
          (haskell-mode . flycheck-haskell-setup)))
 
+;; Elm
+(use-package elm-mode
+  :load-path "pkgs/elm-mode"
+  :mode ("\\.elm\\'" . elm-mode))
+
 (use-package web-mode
   :load-path "pkgs/web-mode"
   :mode
