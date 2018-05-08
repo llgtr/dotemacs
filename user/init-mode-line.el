@@ -100,7 +100,7 @@
      " "
      (substring vc-mode 5)
      " "
-     (if (memq state '(edited added)) "✔" "✘"))))
+     (if (memq state '(edited added)) "✘" "✔"))))
 
 (defun flycheck-error-info ()
   "Show Flycheck's state"
