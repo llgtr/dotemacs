@@ -55,17 +55,8 @@
 (use-package web-mode
   :load-path "pkgs/web-mode"
   :mode
-  ("\\.html?\\'" . web-mode))
-
-(use-package js2-mode
-  :load-path "pkgs/js2-mode"
-  :mode
-  ("\\.js?\\'" . js2-mode))
-
-(use-package rjsx-mode
-  :load-path "pkgs/rjsx-mode"
-  :requires js2-mode
-  :mode
-  ("\\.jsx?\\'" . rjsx-mode))
+  ("\\.html?\\'" . web-mode)
+  ("\\.js?\\'" . web-mode)
+  ("\\.jsx?\\'" . web-mode))
 
 (provide 'init-lang)
