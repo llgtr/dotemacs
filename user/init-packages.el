@@ -57,7 +57,7 @@
   :config
   (ivy-mode 1)
   (setq ivy-use-virtual-buffers t)
-  (setq ivy-height 5)
+  (setq ivy-height 20)
   (defun ivy-format-function-default (cands)
     "Transforms CANDS into a string for minibuffer."
     (ivy--format-function-generic
