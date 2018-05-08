@@ -55,17 +55,16 @@
 (use-package web-mode
   :load-path "pkgs/web-mode"
   :mode
-  ("\\.html?\\'" . web-mode))
-
-(use-package js2-mode
-  :load-path "pkgs/js2-mode"
-  :mode
-  ("\\.js?\\'" . js2-mode))
-
-(use-package rjsx-mode
-  :load-path "pkgs/rjsx-mode"
-  :requires js2-mode
-  :mode
-  ("\\.jsx?\\'" . rjsx-mode))
+  ("\\.html?\\'" . web-mode)
+  ("\\.js?\\'" . web-mode)
+  ("\\.jsx?\\'" . web-mode)
+  :config
+  (add-to-list 'web-mode-indentation-params '("lineup-args" . nil))
+  (add-to-list 'web-mode-indentation-params '("lineup-calls" . nil))
+  (add-to-list 'web-mode-indentation-params '("lineup-concats" . nil))
+  (add-to-list 'web-mode-indentation-params '("lineup-ternary" . nil))
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+  (setq web-mode-code-indent-offset 2))
 
 (provide 'init-lang)
