@@ -49,9 +49,11 @@
 ;; Start in fullscreen mode
 (custom-set-variables '(initial-frame-alist '((fullscreen . maximized))))
 
-;; Familiar behaviour for alt-keys
+;; MacOS things
 (when (eq system-type 'darwin)
   (setq mac-option-key-is-meta t)
-  (setq mac-right-option-modifier nil))
+  (setq mac-right-option-modifier nil)
+  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+  (add-to-list 'default-frame-alist '(ns-appearance . dark)))
 
 (provide 'init-misc-configs)
