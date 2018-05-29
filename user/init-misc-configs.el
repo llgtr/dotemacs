@@ -34,7 +34,7 @@
 (setq inhibit-startup-message t)
 (setq initial-scratch-message
       (format ";;
-;;                        Welcome to emacs %s       ,           ,
+;;                        Welcome to emacs %s
 ;;           ___     ___     //                        /             \\
 ;;          /   \\~~~/   \\   //                        ((__-^^-,-^^-__))
 ;;    ,----(     .  .    )                             '-_---' '---_-'
