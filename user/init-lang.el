@@ -22,8 +22,8 @@
 (use-package clojure-mode
   :load-path "pkgs/clojure-mode"
   :mode ("\\.clj\\'"  . clojure-mode)
-        ("\\.cljs\\'" . clojure-mode)
-        ("\\.cljc\\'" . clojure-mode))
+        ("\\.cljs\\'" . clojurescript-mode)
+        ("\\.cljc\\'" . clojurec-mode))
 
 (use-package rainbow-delimiters
   :load-path "pkgs/rainbow-delimiters"
