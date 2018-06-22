@@ -56,4 +56,9 @@
   (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
   (add-to-list 'default-frame-alist '(ns-appearance . dark)))
 
+(use-package exec-path-from-shell
+  :if (eq system-type 'darwin)
+  :load-path "pkgs/exec-path-from-shell"
+  :config (exec-path-from-shell-initialize))
+
 (provide 'init-misc-configs)
