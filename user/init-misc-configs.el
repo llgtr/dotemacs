@@ -8,9 +8,11 @@
 ;; Indent with spaces rather than tabs by default
 (setq-default indent-tabs-mode nil)
 
+;; Follow symlinked files without confirmation
+(setq vc-follow-symlinks t)
+
 ;; Whitespace mode config
 (setq whitespace-style '(face tabs newline trailing lines))
-(global-set-key (kbd "C-x w") 'whitespace-mode)
 
 ;; Recent files
 (recentf-mode)
@@ -18,14 +20,15 @@
 
 ;; Better backup configurations
 ;; (Be careful with this if editing sensitive files via emacs)
-(let ((backup-directory (expand-file-name "backup" user-emacs-directory)))
+(let ((backup-directory (expand-file-name "backup/" user-emacs-directory))
+      (auto-save-directory (expand-file-name "auto-save-list/" user-emacs-directory)))
   ; https://www.gnu.org/software/emacs/manual/html_node/elisp/Backquote.html
   (setq backup-directory-alist `(("." . ,backup-directory))
-        make-backup-files t
+        auto-save-file-name-transforms `((".*" ,auto-save-directory t))
         backup-by-copying t
         version-control t
-        delete-old-versions t
-        auto-save-default t))
+        vc-make-backup-files t
+        delete-old-versions -1))
 
 ;; Set font
 (add-to-list 'default-frame-alist '(font . "Iosevka Term 12"))

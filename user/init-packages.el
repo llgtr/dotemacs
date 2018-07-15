@@ -2,13 +2,10 @@
 
 ;; Path for `use-package` and its dependency
 (let ((default-directory (expand-file-name "pkgs" user-emacs-directory)))
-  (normal-top-level-add-to-load-path '("use-package"
-                                       "diminish")))
+  (normal-top-level-add-to-load-path '("use-package")))
 
 (eval-when-compile
   (require 'use-package))
-(require 'bind-key)
-(require 'diminish)
 
 ;; Libs
 (use-package dash
@@ -43,7 +40,7 @@
 (use-package evil
   :load-path "pkgs/evil"
   :config
-  (evil-mode 1))
+  (evil-mode))
 
 (use-package base16-theme
   :load-path "pkgs/base16-theme"
@@ -71,9 +68,7 @@
   :demand t
   :config
   (which-key-mode)
-  :commands (which-key-show-top-level)
-  :bind ("C-+" . which-key-show-top-level)
-  :diminish which-key-mode)
+  (setq which-key-idle-secondary-delay 0))
 
 (use-package rainbow-mode
   :load-path "pkgs/rainbow-mode"
