@@ -65,8 +65,7 @@
   :load-path "pkgs/smartparens"
   :config
   (require 'smartparens-config)
-  (smartparens-global-mode t)
-  :diminish smartparens-mode)
+  (smartparens-global-mode t))
 
 (use-package which-key
   :load-path "pkgs/which-key"
