@@ -12,6 +12,10 @@
 (setq whitespace-style '(face tabs newline trailing lines))
 (global-set-key (kbd "C-x w") 'whitespace-mode)
 
+;; Recent files
+(recentf-mode)
+(setq recentf-max-menu-items 25)
+
 ;; Better backup configurations
 ;; (Be careful with this if editing sensitive files via emacs)
 (let ((backup-directory (expand-file-name "backup" user-emacs-directory)))
