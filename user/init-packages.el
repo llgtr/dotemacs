@@ -56,6 +56,11 @@
   (setq ivy-use-virtual-buffers t)
   (setq ivy-height 10))
 
+(use-package avy
+  :load-path "pkgs/avy"
+  :config
+  (setq avy-background t))
+
 (use-package smartparens
   :load-path "pkgs/smartparens"
   :config

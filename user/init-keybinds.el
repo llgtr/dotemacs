@@ -50,6 +50,12 @@
    "i" '(:ignore t :wk "Insert")
    "ic" 'insert-char
 
+   ;; Jump
+   "j" '(:ignore t :wk "Jump")
+   "jc" 'avy-goto-char
+   "jw" 'avy-goto-word-1
+   "jl" 'avy-goto-line
+
    ;; Projectile / project
    "p" '(:ignore t :wk "Project")
    "p!" 'projectile-run-shell-command
