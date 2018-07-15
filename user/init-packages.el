@@ -55,17 +55,9 @@
 (use-package ivy
   :load-path "pkgs/ivy"
   :config
-  (ivy-mode 1)
+  (ivy-mode)
   (setq ivy-use-virtual-buffers t)
-  (setq ivy-height 20)
-  (defun ivy-format-function-default (cands)
-    "Transforms CANDS into a string for minibuffer."
-    (ivy--format-function-generic
-     (lambda (str)
-       (ivy--add-face str 'ivy-current-match))
-     #'identity
-     cands
-     " ")))
+  (setq ivy-height 10))
 
 (use-package smartparens
   :load-path "pkgs/smartparens"
@@ -91,6 +83,7 @@
 (use-package projectile
   :load-path "pkgs/projectile"
   :config
+  (setq projectile-completion-system 'ivy)
   (projectile-mode))
 
 (require 'init-mode-line)
