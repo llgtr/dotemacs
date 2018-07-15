@@ -67,14 +67,26 @@
    "tw" 'whitespace-mode
 
    "T" '(:ignore t :wk "UI toggles")
+   "Tt" 'tool-bar-mode
+   "Tm" 'menu-bar-mode
 
    ;; Windows
    "w" '(:ignore t :wk "Windows")
    "w\"" 'split-window-below
    "w%" 'split-window-right
    "wd" 'delete-window
-   "wD" 'delete-other-windows
-   )
+   "wD" 'delete-other-windows)
+
+  ;; Org-mode
+  (general-define-key
+    :states '(normal visual insert emacs)
+    :prefix ","
+    :non-normal-prefix "M-,"
+    :keymaps 'org-mode-map
+    "t" 'org-todo
+    "e" 'org-export-dispatch
+    "s" 'org-schedule
+    )
   )
 
 (provide 'init-keybinds)
