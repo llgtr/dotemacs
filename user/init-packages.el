@@ -81,6 +81,7 @@
   (setq projectile-completion-system 'ivy)
   (projectile-mode))
 
+(require 'init-keybinds)
 (require 'init-mode-line)
 (require 'init-lang)
 
