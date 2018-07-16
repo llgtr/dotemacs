@@ -52,6 +52,7 @@
   :load-path "pkgs/elm-mode"
   :mode ("\\.elm\\'" . elm-mode))
 
+;; Web mode
 (use-package web-mode
   :load-path "pkgs/web-mode"
   :mode
@@ -64,7 +65,9 @@
   (add-to-list 'web-mode-indentation-params '("lineup-concats" . nil))
   (add-to-list 'web-mode-indentation-params '("lineup-ternary" . nil))
   (setq web-mode-markup-indent-offset 2)
-  (setq web-mode-css-indent-offset 2)
   (setq web-mode-code-indent-offset 2))
+
+;; CSS
+(setq css-indent-offset 2)
 
 (provide 'init-lang)
