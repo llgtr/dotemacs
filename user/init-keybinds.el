@@ -1,12 +1,16 @@
 ;;; -*- lexical-binding: t -*-
 
+(defvar main-leader-key "SPC")
+(defvar alt-leader-key "M-SPC")
+(defvar main-major-mode-leader-key ",")
+
 (use-package general
   :load-path "pkgs/general"
   :config
   (general-define-key
    :states '(normal visual insert emacs)
-   :prefix "SPC" ;; Leader key
-   :non-normal-prefix "M-SPC" ;; Alternative leader when in insert or emacs mode
+   :prefix main-leader-key
+   :non-normal-prefix alt-leader-key ;; When in insert or emacs mode
    :keymaps 'override
 
    ;; General binds
@@ -79,9 +83,8 @@
 
   ;; Org-mode
   (general-define-key
-    :states '(normal visual insert emacs)
-    :prefix ","
-    :non-normal-prefix "M-,"
+    :states '(normal visual)
+    :prefix main-major-mode-leader-key
     :keymaps 'org-mode-map
     "t" 'org-todo
     "e" 'org-export-dispatch
