@@ -24,6 +24,7 @@
 
    ;; Buffers
    "b" '(:ignore t :wk "Buffers")
+   "bb" 'ivy-switch-buffer
    "bd" 'kill-buffer
    "bw" 'read-only-mode
    "bl" 'list-buffers
