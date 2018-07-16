@@ -87,9 +87,50 @@
     :states '(normal visual)
     :prefix main-major-mode-leader-key
     :keymaps 'org-mode-map
-    "t" 'org-todo
+
+    "." 'org-time-stamp
+    "," 'org-priority
+    ";" 'org-toggle-comment
+    "<" 'org-date-from-calendar
+    "d" 'org-deadline
     "e" 'org-export-dispatch
+    "l" 'org-insert-link
     "s" 'org-schedule
+    "T" 'org-todo
+    "#" 'org-update-statistics-cookies
+    "i" 'org-clock-in
+    "o" 'org-clock-out
+    "r" 'org-clock-report
+    "b" 'org-toggle-checkbox
+
+    ;; Tables
+    "tc" 'org-table-create-or-convert-from-region
+    "tk" 'org-table-move-row-up
+    "tj" 'org-table-move-row-down
+    "th" 'org-table-move-column-left
+    "tl" 'org-table-move-column-right
+    "tir" 'org-table-insert-row
+    "tic" 'org-table-insert-column
+    "tdr" 'org-table-kill-row
+    "tdc" 'org-table-delete-column
+    )
+
+  ;; Clojure(script)-mode
+  (general-define-key
+    :states '(normal visual)
+    :prefix main-major-mode-leader-key
+    :keymaps 'clojure-mode-map
+
+    "c" 'cider-jack-in
+    ;; TODO: cider bindings
+    )
+
+  (general-define-key
+    :states '(normal visual)
+    :prefix main-major-mode-leader-key
+    :keymaps 'wdired-mode-map
+
+    "s" 'wdired-finish-edit
     )
   )
 
