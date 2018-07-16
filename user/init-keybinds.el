@@ -11,7 +11,7 @@
 
    ;; General binds
    "SPC" '(execute-extended-command :wk "M-x")
-   "TAB" '(other-window :wk "Cycle windows")
+   "TAB" 'ace-window
 
    ;; Applications
    "a" '(:ignore t :wk "Applications")

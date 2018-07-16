@@ -61,6 +61,11 @@
   :config
   (setq avy-background t))
 
+(use-package ace-window
+  :load-path "pkgs/ace-window"
+  :defer t
+  :commands (ace-window))
+
 (use-package smartparens
   :load-path "pkgs/smartparens"
   :config
