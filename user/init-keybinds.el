@@ -125,13 +125,27 @@
     ;; TODO: cider bindings
     )
 
+  ;; Editable dired
   (general-define-key
     :states '(normal visual)
     :prefix main-major-mode-leader-key
     :keymaps 'wdired-mode-map
 
-    "s" 'wdired-finish-edit
-    )
+    "s" 'wdired-finish-edit)
+
+  ;; Web-mode
+  (general-define-key
+    :states '(normal visual)
+    :prefix main-major-mode-leader-key
+    :keymaps 'web-mode-map
+
+    "f" 'web-mode-fold-or-unfold
+    "w" 'web-mode-whitespaces-show
+    "ei" 'web-mode-element-insert
+    "ek" 'web-mode-element-kill
+    "en" 'web-mode-element-next
+    "ep" 'web-mode-element-previous
+    "ec" 'web-mode-element-close)
   )
 
 (provide 'init-keybinds)
