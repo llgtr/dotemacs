@@ -16,6 +16,9 @@
    ;; General binds
    "SPC" '(execute-extended-command :wk "M-x")
    "TAB" 'ace-window
+   "!" 'shell-command
+   "&" 'async-shell-command
+   "?" 'emacs-init-time
 
    ;; Applications
    "a" '(:ignore t :wk "Applications")
@@ -35,6 +38,11 @@
    "c" '(:ignore t :wk "Comments")
    "cr" 'comment-region
    "cl" 'comment-line
+
+   ;; Errors
+   "e" '(:ignore t :wk "Errors")
+   "en" 'next-error
+   "ep" 'previous-error
 
    ;; Files
    "f" '(:ignore t :wk "Files")
@@ -64,9 +72,17 @@
 
    ;; Projectile / project
    "p" '(:ignore t :wk "Project")
-   "p!" 'projectile-run-shell-command
+   "p!" 'projectile-run-shell-command-in-root
+   "p&" 'projectile-run-async-shell-command-in-root
    "pD" 'projectile-dired
    "pf" 'projectile-find-file
+   "pr" 'projectile-recentf
+   "pp" 'projectile-switch-project
+   "pk" 'projectile-kill-buffers
+
+   ;; Registers
+   "r" '(:ignore t :wk "Registers")
+   "re" 'evil-show-registers
 
    ;; Toggles
    "t" '(:ignore t :wk "Toggles")
@@ -80,6 +96,7 @@
    "w" '(:ignore t :wk "Windows")
    "w\"" 'split-window-below
    "w%" 'split-window-right
+   "w=" 'balance-windows
    "wd" 'delete-window
    "wD" 'delete-other-windows)
 
