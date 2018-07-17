@@ -79,11 +79,6 @@
   (which-key-mode)
   (setq which-key-idle-secondary-delay 0))
 
-(use-package rainbow-mode
-  :load-path "pkgs/rainbow-mode"
-  :defer t
-  :commands (rainbow-mode))
-
 (use-package projectile
   :load-path "pkgs/projectile"
   :config
