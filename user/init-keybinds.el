@@ -54,6 +54,7 @@
    ;; Insert
    "i" '(:ignore t :wk "Insert")
    "ic" 'insert-char
+   "iy" 'yas-insert-snippet
 
    ;; Jump
    "j" '(:ignore t :wk "Jump")
