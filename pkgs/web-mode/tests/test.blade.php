@@ -1,5 +1,7 @@
 <div>
 
+  <span>@lang('consumption.this_month')</span>
+
   Hello, {!! $name !!}.
 
   {{ isset($name) ? $name : 'Default' }}
@@ -49,3 +51,5 @@
   @show
 
 </div>
+
+<span>@choice('foo', 2)</span>
