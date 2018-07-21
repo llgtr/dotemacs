@@ -159,6 +159,7 @@
 
     "f" 'web-mode-fold-or-unfold
     "w" 'web-mode-whitespaces-show
+    "r" 'web-mode-reload
     "ei" 'web-mode-element-insert
     "ek" 'web-mode-element-kill
     "en" 'web-mode-element-next

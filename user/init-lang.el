@@ -59,6 +59,7 @@
   ("\\.html?\\'" . web-mode)
   ("\\.js?\\'" . web-mode)
   ("\\.jsx?\\'" . web-mode)
+  ("\\.json?\\'" . web-mode)
   :config
   (add-to-list 'web-mode-indentation-params '("lineup-args" . nil))
   (add-to-list 'web-mode-indentation-params '("lineup-calls" . nil))
