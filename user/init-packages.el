@@ -9,19 +9,19 @@
 
 ;; Libs
 (use-package dash
-  :load-path "lib/dash"
+  :load-path "pkgs/dash"
   :defer t)
 
 (use-package pkg-info
-  :load-path "lib/pkg-info"
+  :load-path "pkgs/pkg-info"
   :defer t)
 
 (use-package spinner
-  :load-path "lib/spinner"
+  :load-path "pkgs/spinner"
   :defer t)
 
 (use-package queue
-  :load-path "lib/queue"
+  :load-path "pkgs/queue"
   :demand t)
 
 (use-package undo-tree
@@ -29,11 +29,11 @@
   :demand t)
 
 (use-package f
-  :load-path "lib/f"
+  :load-path "pkgs/f"
   :defer t)
 
 (use-package s
-  :load-path "lib/s"
+  :load-path "pkgs/s"
   :defer t)
 
 ;; Packages
