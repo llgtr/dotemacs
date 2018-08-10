@@ -14,7 +14,7 @@
    :keymaps 'override
 
    ;; General binds
-   "SPC" '(execute-extended-command :wk "M-x")
+   "SPC" '(execute-extended-command :wk "counsel-M-x")
    "TAB" 'ace-window
    "!" 'shell-command
    "&" 'async-shell-command
@@ -52,9 +52,9 @@
    "h" '(:ignore t :wk "Help")
    "hw" 'which-key-show-top-level
    "hm" 'which-key-show-major-mode
-   "hdv" 'describe-variable
-   "hdf" 'describe-function
-   "hdF" 'describe-face
+   "hdv" 'counsel-describe-variable
+   "hdf" 'counsel-describe-function
+   "hdF" 'counsel-describe-face
    "hdk" 'describe-key
    "hdp" 'describe-package
    "hdm" 'describe-mode
@@ -83,6 +83,7 @@
    ;; Registers
    "r" '(:ignore t :wk "Registers")
    "re" 'evil-show-registers
+   "ry" 'counsel-yank-pop
 
    ;; Toggles
    "t" '(:ignore t :wk "Toggles")

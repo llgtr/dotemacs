@@ -56,6 +56,14 @@
   (setq ivy-use-virtual-buffers t)
   (setq ivy-height 10))
 
+(use-package counsel
+  :load-path "pkgs/ivy"
+  :commands
+  (counsel-yank-pop
+   counsel-describe-variable
+   counsel-describe-function
+   counsel-describe-face))
+
 (use-package avy
   :load-path "pkgs/avy"
   :config
