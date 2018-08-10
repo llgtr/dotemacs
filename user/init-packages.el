@@ -42,6 +42,11 @@
   :config
   (evil-mode))
 
+(use-package evil-surround
+  :load-path "pkgs/evil-surround"
+  :config
+  (global-evil-surround-mode))
+
 (use-package base16-theme
   :load-path "pkgs/base16-theme"
   :init
