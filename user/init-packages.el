@@ -72,13 +72,7 @@
 (use-package ace-window
   :load-path "pkgs/ace-window"
   :defer t
-  :commands (ace-window))
-
-(use-package smartparens
-  :load-path "pkgs/smartparens"
-  :config
-  (require 'smartparens-config)
-  (smartparens-global-mode t))
+  :commands ace-window)
 
 (use-package which-key
   :load-path "pkgs/which-key"
