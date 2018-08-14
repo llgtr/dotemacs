@@ -103,6 +103,12 @@
    (sh-mode . yas-minor-mode))
   :config (yas-reload-all))
 
+(use-package smartparens
+  :load-path "pkgs/smartparens"
+  :config
+  (require 'smartparens-config)
+  (smartparens-global-mode))
+
 (require 'init-keybinds)
 (require 'init-mode-line)
 (require 'init-lang)
