@@ -74,7 +74,7 @@
    "p" '(:ignore t :wk "Project")
    "p!" 'projectile-run-shell-command-in-root
    "p&" 'projectile-run-async-shell-command-in-root
-   "pD" 'projectile-dired
+   "pd" 'projectile-dired
    "pf" 'projectile-find-file
    "pr" 'projectile-recentf
    "pp" 'projectile-switch-project

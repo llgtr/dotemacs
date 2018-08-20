@@ -106,7 +106,6 @@
 (use-package smartparens
   :load-path "pkgs/smartparens"
   :config
-  (require 'smartparens-config)
   (smartparens-global-mode))
 
 (require 'init-keybinds)
