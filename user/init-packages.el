@@ -52,7 +52,7 @@
   :init
   (add-to-list 'custom-theme-load-path (expand-file-name "pkgs/base16-theme/build" user-emacs-directory))
   :config
-  (load-theme 'base16-eighties t))
+  (load-theme 'base16-gruvbox-dark-pale t))
 
 (use-package ivy
   :load-path "pkgs/ivy"
