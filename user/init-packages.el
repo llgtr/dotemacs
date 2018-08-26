@@ -108,6 +108,10 @@
   :config
   (smartparens-global-mode))
 
+(use-package editorconfig
+  :load-path "pkgs/editorconfig"
+  :config (editorconfig-mode))
+
 (require 'init-keybinds)
 (require 'init-mode-line)
 (require 'init-lang)
