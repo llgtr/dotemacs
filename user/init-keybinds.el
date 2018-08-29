@@ -88,6 +88,7 @@
    ;; Search
    "s" '(:ignore t :wk "Registers")
    "sa" 'counsel-ag
+   "sg" 'counsel-git-grep
 
    ;; Toggles
    "t" '(:ignore t :wk "Toggles")

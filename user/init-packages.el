@@ -67,7 +67,9 @@
   (counsel-yank-pop
    counsel-describe-variable
    counsel-describe-function
-   counsel-describe-face))
+   counsel-describe-face
+   counsel-git-grep
+   counsel-ag))
 
 (use-package avy
   :load-path "pkgs/avy"
