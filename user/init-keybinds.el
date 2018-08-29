@@ -10,7 +10,7 @@
   (general-define-key
    :states '(normal visual insert emacs)
    :prefix main-leader-key
-   :non-normal-prefix alt-leader-key ;; When in insert or emacs mode
+   :non-normal-prefix alt-leader-key ; When in insert or emacs mode
    :keymaps 'override
 
    ;; General binds
@@ -85,6 +85,10 @@
    "re" 'evil-show-registers
    "ry" 'counsel-yank-pop
 
+   ;; Search
+   "s" '(:ignore t :wk "Registers")
+   "sa" 'counsel-ag
+
    ;; Toggles
    "t" '(:ignore t :wk "Toggles")
    "tw" 'whitespace-mode
@@ -122,7 +126,7 @@
     "r" 'org-clock-report
     "b" 'org-toggle-checkbox
 
-    ;; Tables
+    ; Tables
     "tc" 'org-table-create-or-convert-from-region
     "tk" 'org-table-move-row-up
     "tj" 'org-table-move-row-down
@@ -141,7 +145,7 @@
     :keymaps 'clojure-mode-map
 
     "c" 'cider-jack-in
-    ;; TODO: cider bindings
+    ; TODO: cider bindings
     )
 
   ;; Editable dired
