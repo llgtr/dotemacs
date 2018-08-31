@@ -4,6 +4,7 @@
 
 ;; Turn these off early to avoid seeing them at all
 (scroll-bar-mode 0)
+(menu-bar-mode 0)
 (tool-bar-mode 0)
 
 ;; Set garbage collection
