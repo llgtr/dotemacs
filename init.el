@@ -8,7 +8,7 @@
 
 ;; Set garbage collection
 (setq gc-cons-threshold (* 128 1024 1024))
-(add-hook 'after-init-hook
+(add-hook 'emacs-startup-hook
           (lambda () (setq gc-cons-threshold (* 20 1024 1024))))
 
 ;; Path to user directory
