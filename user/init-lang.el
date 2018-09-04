@@ -67,4 +67,10 @@
   (add-to-list 'web-mode-indentation-params '("lineup-ternary" . nil))
   (setq web-mode-enable-auto-quoting nil))
 
+;; Markdown
+(use-package markdown-mode
+  :load-path "pkgs/markdown-mode"
+  :mode
+  ("\\.md?\\'" . markdown-mode))
+
 (provide 'init-lang)
