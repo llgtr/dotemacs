@@ -114,6 +114,10 @@
   :load-path "pkgs/editorconfig"
   :config (editorconfig-mode))
 
+(use-package ox-hugo
+  :load-path "pkgs/ox-hugo"
+  :after ox)
+
 (require 'init-keybinds)
 (require 'init-mode-line)
 (require 'init-lang)
