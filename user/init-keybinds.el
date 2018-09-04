@@ -104,7 +104,12 @@
    "w%" 'split-window-right
    "w=" 'balance-windows
    "wd" 'delete-window
-   "wD" 'delete-other-windows)
+   "wD" 'delete-other-windows
+
+  ;; Quit
+  "q" '(:ignore t :wk "Quit")
+  "qq" 'evil-quit
+  "qQ" 'evil-quit-all)
 
   ;; Org-mode
   (general-define-key
