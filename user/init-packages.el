@@ -146,6 +146,9 @@
   :load-path "pkgs/magit/lisp"
   :commands magit-status)
 
+(use-package evil-magit
+  :load-path "pkgs/evil-magit")
+
 (require 'init-keybinds)
 (require 'init-mode-line)
 (require 'init-lang)
