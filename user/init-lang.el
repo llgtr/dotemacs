@@ -65,7 +65,10 @@
   (add-to-list 'web-mode-indentation-params '("lineup-calls" . nil))
   (add-to-list 'web-mode-indentation-params '("lineup-concats" . nil))
   (add-to-list 'web-mode-indentation-params '("lineup-ternary" . nil))
-  (setq web-mode-enable-auto-quoting nil))
+  (setq web-mode-enable-auto-quoting nil)
+  (setq web-mode-content-types-alist
+    '(("jsx" . "/\\(rn\\|component\\)[s]?/.*\\.js[x]?\\'")))
+  )
 
 ;; Markdown
 (use-package markdown-mode
