@@ -57,8 +57,8 @@
   :load-path "pkgs/web-mode"
   :mode
   ("\\.html?\\'" . web-mode)
-  ("\\.js?\\'" . web-mode)
-  ("\\.jsx?\\'" . web-mode)
+  ("\\.js[x]?\\'" . web-mode)
+  ("\\.ts[x]?\\'" . web-mode)
   ("\\.json?\\'" . web-mode)
   :config
   (add-to-list 'web-mode-indentation-params '("lineup-args" . nil))
