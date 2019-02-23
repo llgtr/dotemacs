@@ -3,7 +3,7 @@
 ;; Author: Vegard Øye <vegard_oye at hotmail.com>
 ;; Maintainer: Vegard Øye <vegard_oye at hotmail.com>
 
-;; Version: 1.2.13
+;; Version: 1.2.14
 
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -595,6 +595,14 @@ Below some empty line"
     ";; [T]his buffer is for notes you don't want to save"
     ("aevil rulz " [escape])
     ";; Tevil rulz[ ]his buffer is for notes you don't want to save"))
+
+(ert-deftest evil-test-visual-append ()
+  "Test `evil-append' from visual state"
+  :tags '(evil insert)
+  (evil-test-buffer
+   ";; [T]his buffer is for notes you don't want to save"
+   ("veA_evil rulz " [escape])
+   ";; This_evil rulz[ ] buffer is for notes you don't want to save"))
 
 (ert-deftest evil-test-open-above ()
   "Test `evil-open-above'"
