@@ -2,7 +2,7 @@
 ;; Author: Vegard Øye <vegard_oye at hotmail.com>
 ;; Maintainer: Vegard Øye <vegard_oye at hotmail.com>
 
-;; Version: 1.2.13
+;; Version: 1.2.14
 
 ;;
 ;; This file is NOT part of GNU Emacs.
@@ -129,6 +129,9 @@
     ;; restore the proper value of `major-mode' in Fundamental buffers
     (when (eq major-mode 'turn-on-evil-mode)
       (setq major-mode 'fundamental-mode))
+    (when (minibufferp)
+      (setq-local evil-default-state 'insert)
+      (setq-local evil-echo-state nil))
     ;; The initial state is usually setup by `evil-initialize' when
     ;; the major-mode in a buffer changes. This preliminary
     ;; initialization is only for the case when `evil-local-mode' is
@@ -170,8 +173,7 @@
 (defun evil-initialize ()
   "Enable Evil in the current buffer, if appropriate.
 To enable Evil globally, do (evil-mode 1)."
-  ;; TODO: option for enabling vi keys in the minibuffer
-  (unless (minibufferp)
+  (unless (and (minibufferp) (not evil-want-minibuffer))
     (evil-local-mode 1)
     (evil-initialize-state)))
 
@@ -320,7 +322,7 @@ initially."
                              nil t (cons mode-alias checked-modes))))))))
 
 (defun evil-set-initial-state (mode state)
-  "Set the initial state for MODE to STATE.
+  "Set the initial state for major mode MODE to STATE.
 This is the state the buffer comes up in."
   (dolist (modes (evil-state-property t :modes))
     (setq modes (cdr-safe modes))
