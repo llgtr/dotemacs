@@ -26,7 +26,9 @@
 
 (use-package undo-tree
   :load-path "pkgs/evil/lib"
-  :demand t)
+  :demand t
+  :config
+  (setq undo-tree-enable-undo-in-region nil))
 
 (use-package f
   :load-path "pkgs/f"
