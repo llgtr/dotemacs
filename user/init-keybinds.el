@@ -67,9 +67,9 @@
 
    ;; Jump
    "j" '(:ignore t :wk "Jump")
-   "jc" 'avy-goto-char
-   "jw" 'avy-goto-word-1
-   "jl" 'avy-goto-line
+   "jc" 'evil-avy-goto-char
+   "jw" 'evil-avy-goto-word-1
+   "jl" 'evil-avy-goto-line
 
    ;; Projectile / project
    "p" '(:ignore t :wk "Project")
