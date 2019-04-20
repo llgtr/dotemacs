@@ -100,7 +100,7 @@
 (use-package ace-window
   :load-path "pkgs/ace-window"
   :defer t
-  :commands ace-window)
+  :commands (ace-window ace-swap-window))
 
 (use-package which-key
   :load-path "pkgs/which-key"

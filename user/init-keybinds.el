@@ -106,6 +106,7 @@
    "w=" 'balance-windows
    "wd" 'delete-window
    "wD" 'delete-other-windows
+   "ws" 'ace-swap-window
 
   ;; Quit
   "q" '(:ignore t :wk "Quit")
