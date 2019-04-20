@@ -100,7 +100,9 @@
 (use-package ace-window
   :load-path "pkgs/ace-window"
   :defer t
-  :commands (ace-window ace-swap-window))
+  :commands (ace-window ace-swap-window)
+  :config
+  (setq aw-scope 'frame))
 
 (use-package which-key
   :load-path "pkgs/which-key"
