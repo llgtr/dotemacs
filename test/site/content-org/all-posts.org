@@ -3,7 +3,7 @@
 #+seq_todo: TODO DRAFT DONE
 #+seq_todo: TEST__TODO | TEST__DONE
 
-#+property: header-args :eval no
+#+property: header-args :eval never-export
 
 #+startup: indent
 
@@ -44,7 +44,7 @@ Export this *first* post only by bringing point here and doing =M-x org-hugo-exp
 This post has no date.
 
 Export this *second* post only by bringing point here and doing =M-x org-hugo-export-wim-to-md=.
-* Image                                                               :image:
+* Image / Figure                                                      :image:
 ** Image links
 :PROPERTIES:
 :EXPORT_FILE_NAME: image-links
@@ -344,6 +344,31 @@ So using =#+html: <style>.foo img ... </style>= and =#+attr_html: :class
 Similarly, =:link=, =:attr=, =:attrlink= parameters in =#+attr_html=
 are also supported to set the corresponding parameter in the Hugo
 =figure= shortcode.
+** Inlined SVG                                                   :svg:inline:
+:PROPERTIES:
+:EXPORT_FILE_NAME: inlined-svg
+:END:
+#+begin_description
+Test inlined SVGs with hyperlinks.
+#+end_description
+{{{oxhugoissue(253)}}}
+
+- [[http://plantuml.com/svg][Example of generating SVG with hyperlinks using PlantUML]]
+- [[https://alligator.io/svg/hyperlinks-svg/][SVGs with hyperlinks need to be inlined]]
+
+Introduce a new ~:inlined t~ HTML attribute.
+
+#+begin_src plantuml :file images/svg-with-hyperlinks.svg :exports results
+skinparam svgLinkTarget _parent
+start
+:[[https://ox-hugo.scripter.co/ ox-hugo homepage]];
+stop
+#+end_src
+#+caption: An SVG with *hyperlinks* -- generated using PlantUML
+#+attr_html: :inlined t
+#+RESULTS:
+[[file:images/svg-with-hyperlinks.svg]]
+
 * Setting heading anchors
 :PROPERTIES:
 :EXPORT_FILE_NAME: setting-heading-anchors
@@ -377,6 +402,10 @@ Something 2.1
 ** Releasing version 1.1
 ** Foo ( Bar ) Baz
 ** (Foo)Bar.Baz&Zoo
+- ~.~ → ~dot~
+- ~&~ → ~and~
+** C++
+- ~+~ → ~plus~
 ** Hey! I have a link [[https://example.org][here]] (Awesome!)
 ** Este título es en español
 ** Non-English titles
@@ -551,6 +580,93 @@ Case where ~EXPORT_HUGO_SECTION~ is set to ~/~.
 This behaves the same as *not setting* ~EXPORT_HUGO_SECTION~ at all.
 
 This post is created at the site root.
+** Section fragment concatenation       :fragment:concatenation:deep_nesting:
+*** sub1 section
+:PROPERTIES:
+:EXPORT_HUGO_SECTION*: sub1
+:END:
+**** Post in sub1
+:PROPERTIES:
+:EXPORT_FILE_NAME: hugo-section-frag-post-in-posts-sub1
+:END:
+#+begin_description
+Test post created in ~posts/sub1~.
+#+end_description
+**** sub1/sub2 section
+:PROPERTIES:
+:EXPORT_HUGO_SECTION*: sub2
+:END:
+***** Post in sub1/sub2
+:PROPERTIES:
+:EXPORT_FILE_NAME: hugo-section-frag-post-in-posts-sub1-sub2
+:END:
+#+begin_description
+Test post created in ~posts/sub1/sub2~.
+#+end_description
+***** sub1/sub2/sub3 section
+:PROPERTIES:
+:EXPORT_HUGO_SECTION*: sub3
+:END:
+****** Post in sub1/sub2/sub3
+:PROPERTIES:
+:EXPORT_FILE_NAME: hugo-section-frag-post-in-posts-sub1-sub2-sub3
+:END:
+#+begin_description
+Test post created in ~posts/sub1/sub2/sub3~.
+#+end_description
+*** Post with all HUGO_SECTION, HUGO_SECTION*, EXPORT_FILE_NAME in same subtree
+:PROPERTIES:
+:EXPORT_HUGO_SECTION: articles
+:EXPORT_HUGO_SECTION*: emacs
+:EXPORT_FILE_NAME: hugo-section-frag-post-in-articles-emacs
+:END:
+#+begin_description
+Test post created in ~articles/emacs~.
+#+end_description
+** Hugo Bundle concatenation :fragment:concatenation:deep_nesting:page_bundles:
+:PROPERTIES:
+:EXPORT_HUGO_SECTION: bundle-concat
+:END:
+*** Articles
+:PROPERTIES:
+:EXPORT_HUGO_SECTION*: articles
+:END:
+**** Articles Index page
+:PROPERTIES:
+:EXPORT_FILE_NAME: _index
+:END:
+This is an index page (/branch/ bundle) for all the articles.
+
+[[https://github.com/kaushalmodi/ox-hugo/issues/210#issuecomment-424891371][Ref]]
+**** Article One
+:PROPERTIES:
+:EXPORT_HUGO_BUNDLE: article-one
+:END:
+***** Article One Index page
+:PROPERTIES:
+:EXPORT_FILE_NAME: _index
+:END:
+This is an index page (/branch/ bundle) for Articles/Article One.
+***** Chapter One
+:PROPERTIES:
+:EXPORT_HUGO_BUNDLE: chapter-one
+:END:
+****** Article One Chapter One Index page
+:PROPERTIES:
+:EXPORT_FILE_NAME: _index
+:END:
+This is an index page (/branch/ bundle) for Articles/Article
+One/Chapter One.
+****** Section 1A
+:PROPERTIES:
+:EXPORT_FILE_NAME: section-1a
+:END:
+This is the content of Articles/Article One/Chapter One/Section 1A.
+****** Section 1B
+:PROPERTIES:
+:EXPORT_FILE_NAME: section-1b
+:END:
+This is the content of Articles/Article One/Chapter One/Section 1B.
 * Tables                                                              :table:
 ** Simple Table
 :PROPERTIES:
@@ -1335,7 +1451,7 @@ code block does not have Markdown syntax lists.
 - list 1
 #+end_src
 *** Example blocks                               :lists:hyphen:example_block:
-**** Example block with list syntax in a list          :@upstream:blackfriday:
+**** Example block with list syntax in a list         :@upstream:blackfriday:
 :PROPERTIES:
 :EXPORT_FILE_NAME: list-has-example-block-with-list-syntax
 :END:
@@ -2027,7 +2143,7 @@ only the HTML output will be created (default).
 Here is the summary.
 #+hugo: more
 Here is text after the [[https://gohugo.io/content-management/summaries#user-defined-manual-summary-splitting][summary splitter]].
-*** COMMENT Summary Splitter at EOF                                             :eof:
+*** COMMENT Summary Splitter at EOF                                     :eof:
 :PROPERTIES:
 :EXPORT_FILE_NAME: summary-splitter-at-eof
 :END:
@@ -2319,10 +2435,11 @@ Index page of /Page Bundle B/.
 
 [[../files-to-be-copied-to-static/foo/copy-2-of-unicorn-logo.png]]
 ** Headless Page Bundle                                            :headless:
+*** Headless Page Bundle X
 :PROPERTIES:
 :EXPORT_HUGO_BUNDLE: headless-page-bundle-x
 :END:
-*** Headless Page Bundle Index Page
+**** Headless Page Bundle Index Page
 :PROPERTIES:
 :EXPORT_FILE_NAME: index
 :EXPORT_HUGO_HEADLESS: t
@@ -2347,25 +2464,24 @@ But you can get it by =.Site.GetPage ...=. Here is an example ([[https://github.
 There are many use cases of such headless page bundles:
 - Shared media galleries
 - Reusable page content "snippets"
-*** Bundled page foo in the headless bundle
+**** Bundled page foo in the headless bundle
 :PROPERTIES:
 :EXPORT_FILE_NAME: foo
 :END:
 "Foo" page in /Headless Page Bundle/.
-*** Bundled page bar in the headless bundle
+**** Bundled page bar in the headless bundle
 :PROPERTIES:
 :EXPORT_FILE_NAME: bar
 :END:
 "Bar" page in /Headless Page Bundle/.
-*** Bundled page zoo in the headless bundle
+**** Bundled page zoo in the headless bundle
 :PROPERTIES:
 :EXPORT_FILE_NAME: zoo
 :END:
 "Zoo" page in /Headless Page Bundle/.
-*** Page using the Headless Page Bundle                              :layout:
+*** Page using the Headless Page Bundle X                            :layout:
 :PROPERTIES:
 :EXPORT_HUGO_SECTION: posts
-:EXPORT_HUGO_BUNDLE:
 :EXPORT_FILE_NAME: page-using-headless-page-bundle
 :EXPORT_HUGO_LAYOUT: headless-bundle-single
 :END:
@@ -2774,10 +2890,10 @@ Once that is evaluated, links like these will export fine i.e. no
 :CUSTOM_ID: link-heading-1
 :END:
 - Link to [[#link-heading-2][Heading 2]]
-#+include: "./all-posts.org::#lorem-ipsum" :only-contents t
-#+include: "./all-posts.org::#lorem-ipsum" :only-contents t
-#+include: "./all-posts.org::#lorem-ipsum" :only-contents t
-#+include: "./all-posts.org::#lorem-ipsum" :only-contents t
+#+include: "./misc/common.org::#lorem-ipsum" :only-contents t
+#+include: "./misc/common.org::#lorem-ipsum" :only-contents t
+#+include: "./misc/common.org::#lorem-ipsum" :only-contents t
+#+include: "./misc/common.org::#lorem-ipsum" :only-contents t
 **** Heading 2
 :PROPERTIES:
 :CUSTOM_ID: link-heading-2
@@ -2804,169 +2920,33 @@ that the link jump is evident):
 /Scroll to the end of the below 'lorem-ipsum' block to find the test
 link./
 
-#+include: "./all-posts.org::#lorem-ipsum" :only-contents t
+#+include: "./misc/common.org::#lorem-ipsum" :only-contents t
 
 *Here we refer to item [[target]].*
-*** Links to source blocks
+*** Links to source blocks                                        :src_block:
 :PROPERTIES:
 :EXPORT_FILE_NAME: links-to-source-blocks
 :END:
-From [[https://orgmode.org/manual/Internal-links.html][(org) Internal links]],
-
-#+begin_quote
-   If no dedicated target exists, the link will then try to match the
-exact name of an element within the buffer.  Naming is done with the
-‘#+name’ keyword, which has to be put in the line before the element it
-refers to, as in the following example
-    #+begin_example
-    ,#+name: My Target
-    | a  | table      |
-    |----+------------|
-    | of | four cells |
-    #+end_example
-#+end_quote
-
-Also, when targeting a =#+name= keyword, *=#+caption= keyword is
-mandatory in order to get proper numbering* for _source blocks_,
-_images_ and _tables_.
-
-So the below code block:
-#+begin_src org
-,#+caption: Hello
-,#+name: code__hello
-,#+begin_src emacs-lisp
-(message "Hello")
-,#+end_src
-
-,*Here we refer to code snippet [[code__helloagain]].*
-
-,#+include: "./all-posts.org::#lorem-ipsum" :only-contents t
-
-,#+caption: Hello Again
-,#+name: code__helloagain
-,#+begin_src emacs-lisp
-(message "Hello again")
-,#+end_src
-
-,*Here we refer to code snippet [[code__hello]].*
-#+end_src
-
-will output below (/lorem-ipsum/ added to increase page content so
-that the link jump is evident):
-
-#+caption: Hello
-#+name: code__hello
-#+begin_src emacs-lisp
-(message "Hello")
-#+end_src
-
-*Here we refer to code snippet [[code__helloagain]].*
-
-#+include: "./all-posts.org::#lorem-ipsum" :only-contents t
-
-#+caption: Hello Again
-#+name: code__helloagain
-#+begin_src emacs-lisp
-(message "Hello again")
-#+end_src
-
-*Here we refer to code snippet [[code__hello]].*
+#+begin_description
+Test for internal links to source block references.
+#+end_description
+#+include: "./single-posts/links-to-org-elements.org::#links-to-source-blocks" :only-contents t
 *** Links to tables                                           :table:caption:
 :PROPERTIES:
 :EXPORT_FILE_NAME: links-to-tables
 :END:
-*Note*: When targeting a =#+name= keyword, *=#+caption= keyword is
-mandatory in order to get proper numbering* for _source blocks_,
-_images_ and _tables_.
-
-#+begin_src org
-,#+caption: Simple table 1
-,#+name: tab__simple1
-| a | b |
-| c | d |
-
-,*Here we refer to table [[tab__simple2]].*
-
-,#+include: "./all-posts.org::#lorem-ipsum" :only-contents t
-
-Here's another table:
-
-,#+caption: Simple table 2
-,#+name: tab__simple2
-| e | f |
-| g | h |
-
-,*Here we refer to table [[tab__simple1]].*
-#+end_src
-
-will output below (/lorem-ipsum/ added to increase page content so
-that the link jump is evident):
-
-#+caption: Simple table 1
-#+name: tab__simple1
-| a | b |
-| c | d |
-
-*Here we refer to table [[tab__simple2]].*
-
-#+include: "./all-posts.org::#lorem-ipsum" :only-contents t
-
-Here's another table:
-
-#+caption: Simple table 2
-#+name: tab__simple2
-| e | f |
-| g | h |
-
-*Here we refer to table [[tab__simple1]].*
------
-Reference: [[https://orgmode.org/manual/Images-and-tables.html][(org) Images and tables]].
-*** Links to images
+#+begin_description
+Test for internal links to table references.
+#+end_description
+#+include: "./single-posts/links-to-org-elements.org::#links-to-tables" :only-contents t
+*** Links to images                                            :image:figure:
 :PROPERTIES:
 :EXPORT_FILE_NAME: links-to-images
 :END:
-*Note*: When targeting a =#+name= keyword, *=#+caption= keyword is
-mandatory in order to get proper numbering* for _source blocks_,
-_images_ and _tables_.
-
-#+begin_src org
-,#+caption: Org Logo
-,#+name: img__org_logo1
-[[/images/org-mode-unicorn-logo.png]]
-
-,*Here we refer to image [[img__org_logo2]].*
-
-,#+include: "./all-posts.org::#lorem-ipsum" :only-contents t
-
-Here's the same image again, but with a different Org link ID:
-
-,#+caption: Same Org Logo
-,#+name: img__org_logo2
-[[/images/org-mode-unicorn-logo.png]]
-
-,*Here we refer to image [[img__org_logo1]].*
-#+end_src
-
-will output below (/lorem-ipsum/ added to increase page content so
-that the link jump is evident):
-
-#+caption: Org Logo
-#+name: img__org_logo1
-[[/images/org-mode-unicorn-logo.png]]
-
-*Here we refer to image [[img__org_logo2]].*
-
-#+include: "./all-posts.org::#lorem-ipsum" :only-contents t
-
-Here's the same image again, but with a different Org link ID:
-
-#+caption: Same Org Logo
-#+name: img__org_logo2
-[[/images/org-mode-unicorn-logo.png]]
-
-*Here we refer to image [[img__org_logo1]].*
------
-Reference: [[https://orgmode.org/manual/Images-and-tables.html][(org) Images and tables]].
+#+begin_description
+Test for internal links to image references.
+#+end_description
+#+include: "./single-posts/links-to-org-elements.org::#links-to-images" :only-contents t
 *** Links to equations                                            :equations:
 :PROPERTIES:
 :EXPORT_FILE_NAME: links-to-equations
@@ -2983,7 +2963,7 @@ C = W\log_{2} (1+\mathrm{SNR})
 Below, /lorem-ipsum/ is added to increase page content so that the
 link jump is evident:
 
-#+include: "./all-posts.org::#lorem-ipsum" :only-contents t
+#+include: "./misc/common.org::#lorem-ipsum" :only-contents t
 
 Here's the same equation again, but with a different label:
 
@@ -3131,6 +3111,12 @@ a^3  &=  σ(W^3a^2 + b^3)\\
 a^L  &= σ(W^La^{L-1} + b^L)\\
 y  &= a^L\\
 \end{align}
+*** =\{= → =\\{=, =\}= → =\\}=
+{{{oxhugoissue(258)}}}
+
+\begin{equation}
+\phi_j(x) = \mathrm{exp}\left\{ - \frac{(x - \mu_j)^2}{2s^2} \right\}
+\end{equation}
 * Lists                                                               :lists:
 ** List following a list
 :PROPERTIES:
@@ -4088,6 +4074,55 @@ with spaces was added in {{{commit(7691f0453b)}}}.
 #+end_description
 *** TEST__TODO This heading's TODO kwd should read as "TEST TODO"
 *** TEST__DONE This heading's TODO kwd should read as "TEST DONE"
+** Deeply nested Org TODO headings                                   :nested:
+*** Reused test body
+:PROPERTIES:
+:CUSTOM_ID: deeply-nested-todo-headings
+:END:
+{{{oxhugoissue(250)}}}
+**** TODO Level 1
+***** TODO Level 2
+****** TODO Level 3
+******* TODO Level 4
+******** TODO Level 5
+********* TODO Level 6
+********** TODO Level 7
+*** Deeply nested Org TODO headings -- Default heading level
+:PROPERTIES:
+:EXPORT_FILE_NAME: deeply-nested-org-todo-headings--default-h
+:END:
+#+include: "./all-posts.org::#deeply-nested-todo-headings" :only-contents t
+*** Deeply nested Org TODO headings -- h1
+:PROPERTIES:
+:EXPORT_FILE_NAME: deeply-nested-org-todo-headings--h1
+:EXPORT_OPTIONS: h:1
+:END:
+#+include: "./all-posts.org::#deeply-nested-todo-headings" :only-contents t
+*** Deeply nested Org TODO headings -- h2
+:PROPERTIES:
+:EXPORT_FILE_NAME: deeply-nested-org-todo-headings--h2
+:EXPORT_OPTIONS: h:2
+:END:
+#+include: "./all-posts.org::#deeply-nested-todo-headings" :only-contents t
+*** Deeply nested Org TODO headings -- h5
+:PROPERTIES:
+:EXPORT_FILE_NAME: deeply-nested-org-todo-headings--h5
+:EXPORT_OPTIONS: h:5
+:END:
+#+include: "./all-posts.org::#deeply-nested-todo-headings" :only-contents t
+*** Deeply nested Org TODO headings -- h6
+:PROPERTIES:
+:EXPORT_FILE_NAME: deeply-nested-org-todo-headings--h6
+:EXPORT_OPTIONS: h:6
+:END:
+#+include: "./all-posts.org::#deeply-nested-todo-headings" :only-contents t
+*** Deeply nested Org TODO headings -- h6, Offset 0
+:PROPERTIES:
+:EXPORT_FILE_NAME: deeply-nested-org-todo-headings--h6--offset0
+:EXPORT_OPTIONS: h:6
+:EXPORT_HUGO_LEVEL_OFFSET: 0
+:END:
+#+include: "./all-posts.org::#deeply-nested-todo-headings" :only-contents t
 * Level Offset                                                 :level_offset:
 ** Default level offset
 :PROPERTIES:
@@ -4485,6 +4520,25 @@ front-matter.
 In this post the =:EXPORT_DATE:= property is set to =2012-2017=, but
 the export will still happen fine, with the =date= front-matter not
 set.
+*** DONE Parsing date from LOGBOOK                         :logbook:noexport:
+:PROPERTIES:
+:EXPORT_FILE_NAME: parsing-date-from-logbook
+:LOG_INTO_DRAWER: t
+:LOGGING: DONE(!)
+:EXPORT_OPTIONS: d:t
+:END:
+:LOGBOOK:
+- State "DONE"       from "DRAFT"      [2018-09-06 Thu 11:42]
+- State "DONE"       from "DRAFT"      [2018-09-06 Thu 11:38]
+:END:
+#+begin_description
+Parse the date from an entry like ~"- State "DONE" from "DRAFT"
+[2018-09-06 Thu 11:25]~.
+#+end_description
+{{{oxhugoissue(203)}}}
+
+In the case of multiple ~"State "DONE" from .."~ entries, use the
+oldest entry to set the ~date~.
 ** Lastmod Date                                                     :lastmod:
 *** Lastmod date set using Org time stamp
 :PROPERTIES:
@@ -4499,6 +4553,28 @@ binding.
 :EXPORT_HUGO_LASTMOD: 2018-01-23
 :END:
 The =lastmod= for this post is Hugo-compatible i.e. [[https://tools.ietf.org/html/rfc3339#section-5.8][RFC3339-compliant]].
+*** DONE Parsing lastmod from LOGBOOK                      :logbook:noexport:
+:PROPERTIES:
+:EXPORT_FILE_NAME: parsing-lastmod-from-logbook
+:LOG_INTO_DRAWER: t
+:LOGGING: DONE(!)
+:EXPORT_OPTIONS: d:t
+:END:
+:LOGBOOK:
+- State "DONE"       from "DRAFT"      [2018-09-06 Thu 11:41]
+- State "DONE"       from "DRAFT"      [2018-09-06 Thu 11:40]
+:END:
+#+begin_description
+If LOGBOOK has multiple entries of ~"- State "DONE" from .."~, use the
+newest entry to parse the ~lastmod~ date from.
+#+end_description
+{{{oxhugoissue(203)}}}
+
+In the case of multiple ~"State "DONE" from .."~ entries,
+- Use the newest entry to set the ~lastmod~.
+- Use the oldest entry to set the ~date~.
+
+*Do not auto-set ~lastmod~ using ~current-time~ in this case.~
 ** Publish Date                                                 :publishdate:
 *** Publish date set using Org time stamp
 :PROPERTIES:
@@ -5130,7 +5206,7 @@ it is disabled using =:EXPORT_OPTIONS: title:nil=.
 This post will be exported without =author= in the front-matter because
 it is disabled using =:EXPORT_OPTIONS: author:nil=.
 ** Creator                                             :creator:front_matter:
-*** Default Creator                            :dont_export_during_make_test:
+*** Default Creator
 :PROPERTIES:
 :EXPORT_DATE: 2017-12-01
 :EXPORT_OPTIONS: creator:t
@@ -5373,7 +5449,7 @@ If the description is set via the subtree property
 #+begin_description
 Description set in special block
 #+end_description
-***** Single-line description with backslashes (TOML) :escaping:backslashes:front_matter:single_line:
+***** Single-line description with backslashes (TOML) :escaping:backslashes:single_line:
 :PROPERTIES:
 :EXPORT_FILE_NAME: description-single-line-escaping-backslashes-org-special-block-toml
 :END:
@@ -5381,7 +5457,7 @@ Description set in special block
 Test to check that backslashes in =\|= and =\\= are correctly escaped.
 #+end_description
 Post content.
-***** Multi-line description with backslashes (TOML) :escaping:backslashes:front_matter:multi_line:
+***** Multi-line description with backslashes (TOML) :escaping:backslashes:multi_line:
 :PROPERTIES:
 :EXPORT_FILE_NAME: description-multi-line-escaping-backslashes-org-special-block-toml
 :END:
@@ -5417,7 +5493,7 @@ show up with line breaks \\
 but within the same paragraph.
 #+end_description
 Post content.
-***** Single-line description with backslashes (YAML) :escaping:backslashes:front_matter:single_line:
+***** Single-line description with backslashes (YAML) :escaping:backslashes:single_line:
 :PROPERTIES:
 :EXPORT_FILE_NAME: description-single-line-escaping-backslashes-org-special-block-yaml
 :END:
@@ -5425,7 +5501,7 @@ Post content.
 Test to check that backslashes in =\|= and =\\= are correctly escaped.
 #+end_description
 Post content.
-***** Multi-line description with backslashes (YAML) :escaping:backslashes:front_matter:multi_line:
+***** Multi-line description with backslashes (YAML) :escaping:backslashes:multi_line:
 :PROPERTIES:
 :EXPORT_FILE_NAME: description-multi-line-escaping-backslashes-org-special-block-yaml
 :END:
@@ -5578,6 +5654,17 @@ extension). So in this case, it would have been
 The markup for this post is set to =org=. So the Markdown markup based
 emphasis *won't work* here.
 ** Replace front-matter keys                                   :keys:replace:
+*** Replace "description" with "summary"                :description:summary:
+:PROPERTIES:
+:EXPORT_FILE_NAME: replace-description-with-summary
+:EXPORT_HUGO_FRONT_MATTER_KEY_REPLACE: description>summary
+:END:
+#+begin_description
+This should be rendered as ~.Summary~ in Hugo v0.55+. For only Hugo
+versions, this will front-matter can be retrieved only as
+~.Params.summary~.
+#+end_description
+This text will be in the post body.
 *** Replace only "linkTitle" key                                  :linktitle:
 :PROPERTIES:
 :EXPORT_FILE_NAME: replace-only-linktitle-key
@@ -5655,6 +5742,182 @@ be ~authors~ instead of the default ~author~ created by ~ox-hugo~.
 This test removes the ~foo~ front-matter key from the exported file
 (and replaces ~bar~ key with ~zoo~).
 #+end_description
+** DONE Parsing notes from LOGBOOK                   :notes:logbook:noexport:
+:PROPERTIES:
+:EXPORT_FILE_NAME: parsing-notes-from-logbook
+:LOG_INTO_DRAWER: t
+:LOGGING: TODO(!) DRAFT(!) DONE(!)
+:EXPORT_OPTIONS: d:t
+:END:
+:LOGBOOK:
+- Note taken on [2018-09-06 Thu 11:45] \\
+  Another note.
+- Note taken on [2018-09-06 Thu 11:37] \\
+  A note
+- State "DONE"       from "DRAFT"      [2018-09-06 Thu 11:25]
+- State "DRAFT"      from "TODO"       [2018-09-06 Thu 11:25]
+- State "TODO"       from              [2018-09-06 Thu 11:25]
+:END:
+#+begin_description
+Parse notes from LOGBOOK into a TOML table (YAML map?) of ~notes~
+front-matter.
+#+end_description
+
+{{{oxhugoissue(203)}}}
+
+For example,
+
+#+begin_src org
+:LOGBOOK:
+- Note taken on [2018-09-06 Thu 11:45] \\
+  Another note.
+- Note taken on [2018-09-06 Thu 11:37] \\
+  A note
+- State "DONE"       from "DRAFT"      [2018-09-06 Thu 11:25]
+- State "DRAFT"      from "TODO"       [2018-09-06 Thu 11:25]
+- State "TODO"       from              [2018-09-06 Thu 11:25]
+:END:
+#+end_src
+
+should export these ~notes~ in TOML front-matter (and the equivalent
+in YAML):
+#+begin_src toml
+[[notes]]
+  index = 0
+  date = 2018-09-06T11:37:00-04:00
+  content = "A note."
+[[notes]]
+  index = 1
+  date = 2018-09-06T11:45:00-04:00
+  content = "Another note."
+#+end_src
+
+- Note :: The state change notes are intentionally put in this test
+          LOGBOOK, because we want to ensure that they don't seep into
+          the ~notes~ front-matter.
+** Extra Front-matter                              :extra:verbatim:src_block:
+:PROPERTIES:
+:EXPORT_HUGO_WEIGHT: 5
+:EXPORT_HUGO_CUSTOM_FRONT_MATTER: :widget "about"
+:EXPORT_HUGO_CUSTOM_FRONT_MATTER+: :active "true"
+:EXPORT_HUGO_CUSTOM_FRONT_MATTER+: :interests '((interests . ("Artificial Intelligence" "Computational Linguistics" "Information Retrieval")))
+:END:
+*** TOML Front-matter                                                  :toml:
+:PROPERTIES:
+:EXPORT_HUGO_FRONT_MATTER_FORMAT: toml
+:END:
+**** Extra Front-matter (TOML, TOML extra)                       :toml_extra:
+:PROPERTIES:
+:EXPORT_FILE_NAME: front-matter-toml-toml-extra
+:END:
+{{{oxhugoissue(226)}}}
+
+The ~#+begin_src toml :front_matter_extra t~ TOML block here will get
+appended to the TOML front-matter.
+#+begin_src toml :front_matter_extra t
+# List your qualifications (such as academic degrees).
+[[education.courses]]
+  course = "PhD in Artificial Intelligence"
+  institution = "Stanford University"
+  year = 2012
+
+[[education.courses]]
+  course = "MEng in Artificial Intelligence"
+  institution = "Massachusetts Institute of Technology"
+  year = 2009
+
+[[education.courses]]
+  course = "BSc in Artificial Intelligence"
+  institution = "Massachusetts Institute of Technology"
+  year = 2008
+#+end_src
+
+#+begin_src toml
+# this TOML block will export to the Markdown body
+#+end_src
+**** Extra Front-matter (TOML, YAML extra)                       :yaml_extra:
+:PROPERTIES:
+:EXPORT_FILE_NAME: front-matter-toml-yaml-extra
+:END:
+{{{oxhugoissue(226)}}}
+
+The ~#+begin_src yaml :front_matter_extra t~ YAML block here will get
+discarded because the front-matter type is TOML.
+#+begin_src yaml :front_matter_extra t
+education:
+  courses:
+    - course: PhD in Artificial Intelligence
+      institution: Stanford University
+      year: 2012
+    - course: MEng in Artificial Intelligence
+      institution: Massachusetts Institute of Technology
+      year: 2009
+    - course: BSc in Artificial Intelligence
+      institution: Massachusetts Institute of Technology
+      year: 2008
+#+end_src
+
+#+begin_src toml
+# this TOML block will export to the Markdown body
+#+end_src
+*** YAML Front-matter                                                  :yaml:
+:PROPERTIES:
+:EXPORT_HUGO_FRONT_MATTER_FORMAT: yaml
+:END:
+**** Extra Front-matter (YAML, YAML extra)                       :yaml_extra:
+:PROPERTIES:
+:EXPORT_FILE_NAME: front-matter-yaml-yaml-extra
+:END:
+{{{oxhugoissue(226)}}}
+
+The ~#+begin_src yaml :front_matter_extra t~ YAML block here will get
+appended to the YAML front-matter.
+#+begin_src yaml :front_matter_extra t
+education:
+  courses:
+    - course: PhD in Artificial Intelligence
+      institution: Stanford University
+      year: 2012
+    - course: MEng in Artificial Intelligence
+      institution: Massachusetts Institute of Technology
+      year: 2009
+    - course: BSc in Artificial Intelligence
+      institution: Massachusetts Institute of Technology
+      year: 2008
+#+end_src
+
+#+begin_src toml
+# this TOML block will export to the Markdown body
+#+end_src
+**** Extra Front-matter (YAML, TOML extra)                       :toml_extra:
+:PROPERTIES:
+:EXPORT_FILE_NAME: front-matter-yaml-toml-extra
+:END:
+{{{oxhugoissue(226)}}}
+
+The ~#+begin_src toml :front_matter_extra t~ TOML block here will get
+discarded because the front-matter type is YAML.
+#+begin_src toml :front_matter_extra t
+# List your qualifications (such as academic degrees).
+[[education.courses]]
+  course = "PhD in Artificial Intelligence"
+  institution = "Stanford University"
+  year = 2012
+
+[[education.courses]]
+  course = "MEng in Artificial Intelligence"
+  institution = "Massachusetts Institute of Technology"
+  year = 2009
+
+[[education.courses]]
+  course = "BSc in Artificial Intelligence"
+  institution = "Massachusetts Institute of Technology"
+  year = 2008
+#+end_src
+
+#+begin_src toml
+# this TOML block will export to the Markdown body
+#+end_src
 * Date and slug inheritance                           :inheritance:date:slug:
 :PROPERTIES:
 :EXPORT_DATE: 2018-02-12
@@ -6683,6 +6946,15 @@ Org TODO state. So the draft state defaults to /false/.
 If a post has the =DRAFT= state set, the =draft= front matter variable
 should be set to =true=, even if the post has a sub-heading
 immediately after the post heading.
+* Illegal cases                        :illegal:dont_export_during_make_test:
+** Subtree with empty EXPORT_FILE_NAME       :subtree:empty:export_file_name:
+:PROPERTIES:
+:EXPORT_FILE_NAME:
+:END:
+#+begin_description
+This subtree must not export because the EXPORT_FILE_NAME is empty.
+#+end_description
+{{{oxhugoissue(211)}}}
 * Reusable sections                                        :noexport:ARCHIVE:
 ** Quote block with source block, followed by source block
 :PROPERTIES:
@@ -6867,62 +7139,6 @@ So, for emacs version 25.0.50.1, this variable will be 25_0.")
 (message "This is line 6")
 ,#+end_src
 #+end_src
-** Lorem Ipsum
-:PROPERTIES:
-:CUSTOM_ID: lorem-ipsum
-:END:
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque et
-quam metus. Etiam in iaculis mi, sit amet pretium magna. Donec ut dui
-mi. Maecenas pharetra sapien nunc, ut mollis enim aliquam quis. Nam at
-ultricies metus. Nulla tempor augue in vestibulum tristique. Phasellus
-volutpat pharetra metus quis suscipit. Morbi maximus sem dolor, id
-accumsan ipsum commodo non.
-
-Fusce quam ligula, gravida ac dui venenatis, bibendum commodo
-lorem. Duis id elit turpis. Integer sed diam nibh. Donec tempus
-lacinia odio, a laoreet velit dictum id. Suspendisse efficitur euismod
-purus et porttitor. Aliquam sit amet tellus mauris. Mauris semper
-dignissim nibh, faucibus vestibulum purus varius quis. Suspendisse
-potenti. Cras at ligula sit amet nunc vehicula condimentum quis nec
-est. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices
-posuere cubilia Curae; Donec iaculis, neque sit amet maximus rhoncus,
-nisl tortor convallis ante, ut mollis purus augue ut justo. Praesent
-felis urna, volutpat sit amet posuere dictum, luctus quis nibh. Proin
-et tristique ipsum, in aliquam ante.
-
-Aenean eget ex mauris. Cras ut tempor quam. Curabitur eget nulla
-laoreet, bibendum neque porta, tempus nulla. Ut tellus nisi, semper eu
-ligula pretium, aliquam accumsan dolor. Nunc fermentum cursus arcu eu
-suscipit. Nam dolor tellus, efficitur sed condimentum at, fringilla
-eget nisi. Nulla luctus metus felis. Suspendisse potenti. Cras lacinia
-orci nec dui sodales commodo. Donec tellus arcu, congue porta ultrices
-non, pretium et sapien. Proin mattis risus dignissim feugiat
-tristique. Donec nibh lorem, facilisis id posuere ut, varius ac
-urna. Etiam ultrices dignissim mauris, quis venenatis ex semper ut.
-
-Curabitur id fermentum erat, rhoncus scelerisque est. Sed pulvinar,
-nulla sed sollicitudin scelerisque, ipsum erat sollicitudin dolor, ut
-commodo arcu justo vel libero. Curabitur turpis dolor, fermentum ut
-elit a, vehicula commodo nunc. Sed sit amet blandit nulla, quis
-sodales massa. Donec lobortis, urna vel volutpat ullamcorper, mauris
-est efficitur nulla, et suscipit velit dui at metus. Aliquam id sem
-sed metus tristique scelerisque nec vitae odio. Phasellus a
-pellentesque libero, vel convallis metus. Sed nec fringilla magna, non
-varius ex. Sed interdum eleifend ligula, quis porta enim ultrices
-a. Donec hendrerit diam ac elementum tincidunt.
-
-Pellentesque eget nisl rhoncus, malesuada justo nec, suscipit
-quam. Nam sodales mauris eu bibendum suscipit. Vivamus sodales dui
-lorem, scelerisque pellentesque diam fermentum sed. Etiam fermentum
-nisl id nisl blandit, sit amet semper erat ultricies. Nulla tincidunt
-nulla metus, eu imperdiet lorem malesuada sagittis. Maecenas accumsan
-risus sed ante eleifend, vitae pretium leo porta. Suspendisse vitae
-eros vitae dui ornare condimentum id sit amet mauris. Etiam tincidunt
-consequat risus, eu posuere mi. Donec ut nunc eu massa porttitor
-suscipit nec nec neque. Suspendisse vitae tincidunt justo, sed
-molestie velit. Nullam pellentesque convallis ante, vel posuere libero
-blandit in.
-# a comment forces paragraph break in Org
 * Meta
 ** Search
 :PROPERTIES:
@@ -6951,8 +7167,3 @@ over multiple lines. But even then it should be handled fine.
 [fn:2] Second footnote
 
 [fn:1] First footnote
-* COMMENT Local Variables                                           :ARCHIVE:
-# Local Variables:
-# fill-column: 70
-# eval: (auto-fill-mode 1)
-# End:
