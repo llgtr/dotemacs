@@ -97,17 +97,6 @@
   (setq projectile-completion-system 'ivy)
   (projectile-mode))
 
-(use-package yasnippet
-  :load-path "pkgs/yasnippet"
-  :defer t
-  :hook
-  ((web-mode . yas-minor-mode)
-   (latex-mode . yas-minor-mode)
-   (markdown-mode . yas-minor-mode)
-   (org-mode . yas-minor-mode)
-   (sh-mode . yas-minor-mode))
-  :config (yas-reload-all))
-
 (use-package smartparens
   :load-path "pkgs/smartparens"
   :config
