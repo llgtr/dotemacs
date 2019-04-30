@@ -31,6 +31,7 @@ Please switch to ~general-key~ or ~general-simulate-key~. Note that keyword argu
 
 * Table of Contents                                            :noexport:TOC:
 - [[#about][About]]
+- [[#dependency-versions][Dependency Versions]]
 - [[#key-features][Key Features]]
 - [[#reading-recommendations][Reading Recommendations]]
 - [[#usage-recommendations-and-documentation-clarifications][Usage Recommendations and Documentation Clarifications]]
@@ -88,6 +89,9 @@ Please switch to ~general-key~ or ~general-simulate-key~. Note that keyword argu
 One advantage of using ~general-define-key~ (or a wrapper for it) even in cases where its extra functionality isn't necessary and doesn't significantly improve brevity is that all keybindings are recorded and can be displayed later with ~general-describe-keybindings~.
 
 This manual explains the most relevant parts of every =general.el= feature. All user-facing functions, macros, and variables also have docstrings (e.g. accessible with =C-h f= or =C-h v=), so please consult these for further details.
+
+* Dependency Versions
+Please use MELPA and not MELPA stable for installing optional dependencies (e.g. evil and use-package). General may rely on functionality not in released versions for these packages, so if you are having trouble, please try updating them.
 
 * Key Features
 - Provides a single function, ~general-define-key~, that is usable for all key definition; wrappers are provided as well
@@ -294,7 +298,7 @@ Although ~general-define-key~ will automatically defer keybindings until the spe
   ;; ...
   )
 
-;; * Setings
+;; * Settings
 ;; change evil's search module after evil has been loaded (`setq' will not work)
 (general-setq evil-search-module 'evil-search)
 #+end_src
@@ -556,7 +560,7 @@ Note that all leading quoted and unquoted symbols and lists are considered to be
 
 This wrapper can also be used, for example, if you want to disable certain commands or keys from working in certain modes by using with =:with= keyword argument (example use case taken from [[https://github.com/emacs-evil/evil-collection/blob/9fc1a19807dfcd0cc2b221832b6e6faad80a291d/evil-collection-util.el#L32][evil-collection]]):
 #+begin_src emacs-lisp
-(general-unbind 'normalInfo-mode-map
+(general-unbind 'normal Info-mode-map
   :with 'ignore
   [remap evil-append]
   [remap evil-append-line]
@@ -723,7 +727,9 @@ Note that when a named prefix keymap/command exists (e.g. ~help-command~), you s
 
 Although both will work correctly, [[https://github.com/justbur/emacs-which-key][which-key]] does not currently show all available keys when ~general-key~ is used, so I would currently recommend using ~general-simulate-key~ instead for an example like this.
 
-On the other hand, ~general-key~ should be preferred for simulating a key that corresponds to a single command. Unlike ~general-simulate-key~, which creates/returns a function, ~general-key~ expands to an extended menu item like ~general-predicate-dispatch~. Using an extended menu item is a simpler and more direct approach as emacs will dynamically look up and act as the specified key. This has the advantage of showing the docstring for the exact command with =C-h k=. If the key to act as is unbound, key lookup can continue (like if =:predicate= returns nil), so having a fallback keybinding is possible with ~general-key~ but not with ~general-simulate-key~.
+On the other hand, ~general-key~ should be preferred for simulating a key that corresponds to a single command. Unlike ~general-simulate-key~, which creates/returns a function, ~general-key~ expands to an extended menu item like ~general-predicate-dispatch~. Using an extended menu item is a simpler and more direct approach as emacs will dynamically look up and act as the specified key. This has the advantage of showing the docstring for the exact command with =C-h k=. If the key to act as is unbound, key lookup can continue (like if =:predicate= returns nil), so having a fallback keybinding is possible with ~general-key~ but not with ~general-simulate-key~. 
+
+Another downside of ~general-simulate-key~ is that any commands/functions called just afterwards will actually be run before the keys are simulated. This won't affect the most common use cases, but it makes setting up and tearing down a context more difficult (e.g. simulating a key in a specific evil state requires using =post-command-hook= for ~general-simulate-key~ but not for ~general-key~).
 
 ~general-key~ may be useful when you want to have a key act as another without having to bind it to the exact command in every relevant keymap:
 #+begin_src emacs-lisp
@@ -732,7 +738,7 @@ On the other hand, ~general-key~ should be preferred for simulating a key that c
 (general-nmap "RET" "C-c C-c")
 #+end_src
 
-~general-simulate-key~ and ~general-key~ also support keyword arguments (=:state= and =:keymap=) to control the context the keys are simulated in. For example:
+~general-simulate-key~ and ~general-key~ also support keyword arguments to control the context the keys are simulated in (both support =:state=; ~general-simulate-key~ supports =:keymap= for now but I don't know how useful it is; please make an issue if you think it would be useful to add =:keymap= to ~general-key~). For example:
 #+begin_src emacs-lisp
 (general-nmap "j" (general-simulate-key "C-n" :state 'emacs))
 ;; `general-key' supports :state only`
@@ -889,7 +895,7 @@ As a final note, if you, for example, bind =s= to a command using ~general-defin
 General.el also provides a few helper functions/macros for other configuration purposes. They are intended to be slightly more convenient versions of functions/macros provided by default.
 
 ** Settings
-~general-setq~ is a stripped-down ~customize-set-variable~ that can act as a drop-in replacement for ~setq~. Some variables defined with ~defcustom~ specify a custom setter with =:set= that must be used for changes to take effect (e.g. =auto-revert-interval=). ~setq~ cannot be used to set such variables correctly if the corresponding package has already been loaded, but ~general-setq~ will correctly use the custom setter when necessary. The benefit of ~general-setq~ over ~customize-set-variable~ is that it can be used to set multiple variables at once. It does not do everything ~customize-set-variable~ does (e.g. it cannot be used interactively, does not attempt to load variable dependencies, and does not allow the user to specify comments). From some basic testing, it is 10x to 100x faster because of this, but the speed difference should not be noticeable if you aren't setting thousands of variables during emacs initialization.
+~general-setq~ is a stripped-down ~customize-set-variable~ that can act as a drop-in replacement for ~setq~. The reason you might want to use it instead of ~setq~ is that ~setq~ cannot correctly set all variables. Some variables defined with ~defcustom~ specify a custom setter with =:set= that must be used for changes to take effect (e.g. =auto-revert-interval=). If the corresponding package has already been loaded, using ~setq~ will generally not work to set these variables. On the other hand, ~general-setq~ will correctly use the custom setter when necessary. One benefit of ~general-setq~ over ~customize-set-variable~ is that it can be used to set multiple variables at once. It does not do everything ~customize-set-variable~ does (e.g. it cannot be used interactively, does not attempt to load variable dependencies, and does not allow the user to specify comments). From some basic testing, it is 10x to 100x faster because of this, but the speed difference should not really be noticeable if you aren't setting thousands of variables during emacs initialization.
 
 Here's an example using variables that have a custom setter:
 #+begin_src emacs-lisp
@@ -899,6 +905,10 @@ Here's an example using variables that have a custom setter:
 #+end_src
 
 Note that ~setq~ will work as expected as long it is used before the corresponding package is loaded, but with ~customize-set-variable~ or ~general-setq~, you do not need to worry about whether or not the package has been loaded. If you decide to use ~general-setq~, I'd recommend aliasing it to something shorter like ~gsetq~.
+
+One major difference from ~customize-set-variable~ that you should be aware of is that ~general-setq~ falls back to using ~set~ instead of ~set-default~. This means that, like ~setq~, it will alter the local value of buffer-local variables instead of the default value.
+
+~general-setq-default~ and ~general-setq-local~ also exist but do not attempt to call custom setters. The reason for this is that I have never seen any custom setters for variables that make sense to set both globally and locally (custom setters I've seen just use ~set-default~). ~setq-default~ is useful when you want to globally change the default for a buffer-local variable. ~setq-local~ is useful when you want to make a non-buffer-local variable buffer-local and then change its local value (~setq~ already preferentially alters the buffer-local value of a variable if there is one). For now, the general.el equivalents are just aliases, but in the future, they will likely record user settings to be displayed in a table later.
 
 ** Hooks and Advice
 ~general-add-hook~, ~general-remove-hook~, ~general-advice-add~, and ~general-advice-remove~ all act as drop-in replacements for their corresponding functions but allow lists for some of the arguments. The hook functions allow specifying lists for the hooks and functions, and the advice functions allow specifying lists for the symbols and functions. Because I don't like the difference in naming for the default advice functions, ~general-add-advice~ and ~general-remove-advice~ are also provided as aliases.
@@ -955,16 +965,8 @@ Symbols specified with =:ghook= correspond to hooks, and the function to add to 
   :ghook 'prog-mode-hook)
 
 (use-package rainbow-delimiters
-  ;; unquoted symbols work fine as well but only when not in an arglist; for
-  ;; consistency with `add-hook' syntax, standalone symbols are always quoted in
-  ;; future examples
-  :ghook prog-mode-hook)
-
-(use-package rainbow-delimiters
   ;; `general-add-hook' arglist: HOOKS FUNCTIONS &optional APPEND LOCAL
   ;; a missing FUNCTIONS argument will be replaced with inferred minor mode
-  ;; command; this may be useful if you have a list of hooks stored in a variable
-  ;; (see below for an example)
   :ghook ('prog-mode-hook))
 
 (use-package rainbow-delimiters
@@ -985,7 +987,7 @@ Symbols specified with =:ghook= correspond to hooks, and the function to add to 
   :init (general-add-hook 'prog-mode-hook #'rainbow-delimiters-mode))
 #+end_src
 
-If you are already familiar with =:hook=, you should note that there are quite a few syntactic differences between =:ghook= and =:hook=. Firstly, quoting the hooks and functions is required. Like =:general= uses the same syntax as ~general-def(ine-key)~ (unlike =:bind=), =:ghook= uses the same syntax as ~(general-)add-hook~ for both clarity and convenience. For example, the user may want to use a helper function/macro to generate the function(s) to add to the hook (see the [[#gfhook-keyword][:gfhook section]] for an example). The user may also want to specify a variable containing a list of hooks instead of an actual hook name:
+If you are already familiar with =:hook=, you should note that there are quite a few syntactic differences between =:ghook= and =:hook=. Firstly, quoting the hooks and functions is required. Like =:general= uses the same syntax as ~general-def(ine-key)~ (unlike =:bind=), =:ghook= uses the same syntax as ~(general-)add-hook~ for both clarity and convenience. For example, the user may want to use a helper function/macro to generate the function(s) to add to the hook (see the [[#gfhook-keyword][:gfhook section]] for a specific example). The user may also want to specify a variable containing a list of hooks instead of an actual hook name:
 #+begin_src emacs-lisp
 (defconst my-lisp-mode-hooks
   '(lisp-mode-hook
@@ -996,8 +998,10 @@ If you are already familiar with =:hook=, you should note that there are quite a
     ))
 
 (use-package lispy
-  ;; must be in a `general-add-hook' argument list, so that it itself is not
-  ;; considered one
+  :ghook my-lisp-mode-hooks)
+
+;; same as
+(use-package lispy
   :ghook (my-lisp-mode-hooks))
 
 ;; same as
@@ -1031,7 +1035,7 @@ Note that if the function name cannot be inferred from the package name (i.e. th
 #+end_src
 
 **** :gfhook Keyword
-=:gfhook= is intended to be used to specify /functions/ to add to the package's mode hook. The hook is inferred from the package's name (by appending either =-mode-hook= or just =-hook= if the package's name ends in =-mode=). If the hook cannot be inferred from the package name, then the full arglist must be specified just as with =:ghook=. Unlike =:ghook=, =:gfhook= never adds functions to =:commands=, and therefore never implies =:defer t=. This is because the functions specified are ones that should be run when turning on (or toggling) the mode(s) the package provides. The specified functions are external to the package, could be called elsewhere, and therefore should not trigger the package to load. The following all have the same effect:
+=:gfhook= is intended to be used to specify /functions/ to add to the package's mode hook. The hook is inferred from the package's name (by appending either =-mode-hook= or just =-hook= if the package's name ends in =-mode=). If the hook cannot be inferred from the package name, then the full arglist must be specified just as with =:ghook=. Unlike =:ghook=, =:gfhook= never adds functions to =:commands= and therefore never implies =:defer t=. This is because the functions specified are ones that should be run when turning on (or toggling) the mode(s) the package provides. The specified functions are external to the package, could be called elsewhere, and therefore should not trigger the package to load. The following all have the same effect:
 #+begin_src emacs-lisp
 (use-package org
   ;; for a major-mode package, you might use :mode to imply :defer t (or just
@@ -1057,7 +1061,7 @@ Note that if the function name cannot be inferred from the package name (i.e. th
   (general-add-hook 'org-mode-hook (list #'visual-line-mode #'my-org-setup)))
 #+end_src
 
-Like with =:ghook=, quoting is still required, so you can use variables and function/macro calls to generate the function to add to the hook:
+Like with =:ghook=, =:gfhook= still requires quoting, so you can use variables and function/macro calls to generate the function to add to the hook:
 #+begin_src emacs-lisp
 (defmacro disable (mode)
   `(lambda () (,mode -1)))
@@ -1167,7 +1171,7 @@ There are several benefits to using general.el to add which-key replacements. Th
 
 Another related benefit of using =:which-key= instead of ~which-key-add-key-based-replacements~ directly even for keys that won't be bound is that replacements will be added for all prefix combinations (i.e. when =:non-normal-prefix= and/or =:global-prefix= are also specified).
 
-The argument supplied to =:which-key= or =:wk= is equivalent to the REPLACEMENT argument in ~which-key-add-key-based-replacements~. It can be a full replacement cons of =(KEY . BINDING)= or just a string (which will be used as the BINDING and serve as the new description). Additionally it can be a function that will return a replacement cons (see the docstring for ~which-key-replacements-alist~ or the which-key README).
+The argument supplied to =:which-key= or =:wk= is equivalent to the REPLACEMENT argument in ~which-key-add-key-based-replacements~. It can be a full replacement cons of =(KEY . BINDING)= or just a string (which will be used as the BINDING and serve as the new description). Additionally it can be a function that will return a replacement cons (see the docstring for ~which-key-replacements-alist~ or the which-key README). Finally, which-key allows for a special replacement of =t= to prevent a key from being shown in the which-key popup at all.
 
 The =:which-key= keyword can be used with the =:major-modes= keyword (locally or globally) which can be compared to using ~which-key-add-major-mode-key-based-replacements~. =:major-modes= can have the following values (see the examples below):
 - =t= - the major mode will be obtained from all keymaps by removing "-map"
@@ -1195,6 +1199,8 @@ Here are some examples:
  ;; for a keymap, only the keys will be matched;
  ;; :no-match-binding is not necessary
  "p" '(:keymap projectile-command-map :wk "projectile prefix")
+ ;; don't display this keybinding at all
+ "z" '(hidden-command :wk t)
  ...)
 
 (general-define-key
