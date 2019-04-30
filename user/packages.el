@@ -149,8 +149,4 @@
   :load-path "pkgs/evil-magit"
   :after magit)
 
-(require 'init-keybinds)
-(require 'init-mode-line)
-(require 'init-lang)
-
-(provide 'init-packages)
+(provide 'packages)

@@ -76,4 +76,4 @@
   :mode
   ("\\.md?\\'" . markdown-mode))
 
-(provide 'init-lang)
+(provide 'lang)

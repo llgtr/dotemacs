@@ -134,4 +134,4 @@
                        (when (boundp 'flycheck-last-status-change)
                          (concat "| " (flycheck-error-info)))))))
 
-(provide 'init-mode-line)
+(provide 'mode-line)

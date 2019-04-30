@@ -181,4 +181,4 @@
     "ec" 'web-mode-element-close)
   )
 
-(provide 'init-keybinds)
+(provide 'keybinds)

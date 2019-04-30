@@ -68,4 +68,4 @@
   :load-path "pkgs/exec-path-from-shell"
   :config (exec-path-from-shell-initialize))
 
-(provide 'init-misc-configs)
+(provide 'misc-configs)

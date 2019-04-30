@@ -16,5 +16,8 @@
 (add-to-list 'load-path (expand-file-name "user" user-emacs-directory))
 
 ;; Load configurations
-(require 'init-packages)
-(require 'init-misc-configs)
+(require 'packages)
+(require 'keybinds)
+(require 'mode-line)
+(require 'lang)
+(require 'misc-configs)
