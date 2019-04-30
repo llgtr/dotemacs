@@ -1,9 +1,10 @@
 # -*- Makefile -*-
 
-TEXI_TOP := EditorConfig Emacs Plugin
+TEXI_CHAPTER := EditorConfig Emacs Plugin
 
 EMACS = emacs
 PANDOC = pandoc
+AWK = awk
 
 PROJECT_ROOT_DIR = $(CURDIR)
 ERT_TESTS = $(wildcard $(PROJECT_ROOT_DIR)/ert-tests/*.el)
@@ -13,8 +14,7 @@ TRAVIS_FILE = .travis.yml
 BATCHFLAGS = -batch -q --no-site-file -L $(PROJECT_ROOT_DIR)
 
 MAIN_SRC = editorconfig.el
-SRCS = editorconfig.el editorconfig-core.el editorconfig-core-handle.el \
-	editorconfig-fnmatch.el
+SRCS = $(wildcard $(PROJECT_ROOT_DIR)/*.el)
 OBJS = $(SRCS:.el=.elc)
 
 $(OBJS): %.elc: %.el
@@ -33,9 +33,9 @@ doc: doc/editorconfig.texi
 doc/editorconfig.texi: README.md doc/header.txt
 	mkdir -p doc
 	tail -n +4 $< | $(PANDOC) -s -f markdown -t texinfo -o $@.body
-	cat doc/header.txt $@.body >$@
-	sed -i.bak -e 's/^@top .*/@top ${TEXI_TOP}/' $@
-	rm -f $@.body $@.bak
+	$(AWK) 'f{print} /^@chapter $(TEXI_CHAPTER)/{f=1;print}' $@.body >$@.body2
+	cat doc/header.txt $@.body2 >$@
+	rm -f $@.body $@.body2
 
 test: test-ert test-core test-metadata $(OBJS)
 	$(EMACS) $(BATCHFLAGS) -l editorconfig.el
@@ -47,7 +47,7 @@ test-travis:
 
 # ert test
 test-ert: $(ERT_TESTS) $(OBJS)
-	git submodule update --init
+	git submodule init
 	$(EMACS) $(BATCHFLAGS) \
 		--eval "(setq debug-on-error t)" \
 		--eval "(require 'ert)" \
@@ -59,7 +59,7 @@ test-ert: $(ERT_TESTS) $(OBJS)
 
 # Core test
 core-test/CMakeLists.txt:
-	git submodule update --init
+	git submodule init
 
 test-core: core-test/CMakeLists.txt $(OBJS)
 	cd $(PROJECT_ROOT_DIR)/core-test && \

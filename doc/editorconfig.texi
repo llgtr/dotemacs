@@ -2,23 +2,11 @@
 @direntry
 * EditorConfig: (editorconfig). EditorConfig Emacs Plugin.
 @end direntry
-\input texinfo
-@documentencoding UTF-8
 
-@ifnottex
-@paragraphindent 0
-@end ifnottex
 @node Top
-@top EditorConfig Emacs Plugin
-
-@menu
-* EditorConfig Emacs Plugin::
-@end menu
-
-@node EditorConfig Emacs Plugin
 @chapter EditorConfig Emacs Plugin
 @anchor{#editorconfig-emacs-plugin}
-This is an @uref{http://editorconfig.org,EditorConfig} plugin for
+This is an @uref{https://editorconfig.org,EditorConfig} plugin for
 @uref{https://www.gnu.org/software/emacs/,Emacs}.
 @menu
 * Installation::
@@ -51,8 +39,8 @@ file:
 @end verbatim
 
 Alternatively, you can find the package available on
-@uref{http://melpa.org/#/editorconfig,MELPA} and
-@uref{http://stable.melpa.org/#/editorconfig,MELPA Stable}
+@uref{https://melpa.org/#/editorconfig,MELPA} and
+@uref{https://stable.melpa.org/#/editorconfig,MELPA Stable}
 (@uref{http://marmalade-repo.org/packages/editorconfig,The Marmalade
 package} is deprecated).
 
@@ -70,7 +58,7 @@ Or if you use
 @section Supported properties
 @anchor{#supported-properties}
 Current Emacs plugin coverage for EditorConfig's
-@uref{http://editorconfig.org/#supported-properties,properties}:
+@uref{https://editorconfig.org/#supported-properties,properties}:
 
 @itemize
 @item
@@ -96,6 +84,8 @@ trailing-newline-free
 @item
 @code{max_line_length}
 @item
+@code{file_type_ext} (Experimental)
+@item
 @code{file_type_emacs} (Experimental)
 @item
 @code{root} (only used by EditorConfig core)
@@ -112,29 +102,46 @@ on our radar. Similarly, we don't yet hook in to all different packages
 for whitespace trimming to inform them about editorconfig settings, but
 aim for better coverage of things like
 @uref{ftp://ftp.lysator.liu.se/pub/emacs/ws-trim.el,ws-trim}.
+@menu
+* File Type::
+@end menu
 
-This plugin also has an experimental support for @code{file_type_emacs},
-which specifies ``file types'' for files. As for Emacs, it means
-@code{major-mode} can be specified: for example, when
-@code{file_type_emacs} is set to @code{markdown} for @code{a.txt},
-@code{markdown-mode} will be enabled when opening @code{a.txt}. This
-property is experimental and its meaning might change in the future
-updates.
+@node File Type
+@subsection File Type
+@anchor{#file-type}
+This plugin has experimental supports for @code{file_type_ext} and
+@code{file_type_emacs}, which specify ``file types'' for files. As for
+Emacs, it means @code{major-mode} can be set.
+
+@strong{file_type_ext} When it is set to @code{md} for @code{a.txt}, for
+example, @code{major-mode} will be decided as if the file name would be
+@code{a.txt.md} (and thus @code{markdown-mode} is likely to be used).
+
+@strong{file_type_emacs} When it is set to @code{markdown} for
+@code{a.txt}, @code{markdown-mode} will be enabled when opening
+@code{a.txt}.
+
+These property are experimental and their meanings might change in the
+future updates. When both are specified, @code{file_type_ext} takes
+precedence.
 
 @node Customize
 @section Customize
 @anchor{#customize}
 @menu
-* editorconfig-custom-hooks::
+* editorconfig-after-apply-functions::
+* editorconfig-hack-properties-functions::
 * editorconfig-indentation-alist::
 * editorconfig-exec-path::
 * editorconfig-get-properties-function::
 @end menu
 
-@node editorconfig-custom-hooks
-@subsection @code{editorconfig-custom-hooks}
-@anchor{#editorconfig-custom-hooks}
-A list of custom hooks after loading common EditorConfig settings, where
+@node editorconfig-after-apply-functions
+@subsection @code{editorconfig-after-apply-functions}
+@anchor{#editorconfig-after-apply-functions}
+(Formerly @code{editorconfig-custom-hooks})
+
+A list of functions after loading common EditorConfig settings, where
 you can set some custom variables or overwrite existing properties.
 
 For example, @code{web-mode} has several variables for indentation
@@ -143,11 +150,31 @@ You may want to stop indenting only blocks of @code{web-mode}: it can be
 achieved by adding following to your init.el:
 
 @verbatim
-(add-hook 'editorconfig-custom-hooks
+(add-hook 'editorconfig-after-apply-functions
   (lambda (hash) (setq web-mode-block-padding 0)))
 @end verbatim
 
 You can also define your own custom properties and enable them here.
+
+@node editorconfig-hack-properties-functions
+@subsection @code{editorconfig-hack-properties-functions}
+@anchor{#editorconfig-hack-properties-functions}
+A list of function to alter property values before applying them.
+
+These functions will be run after loading ".editorconfig" files and
+before applying them to current buffer, so that you can alter some
+properties from ".editorconfig" before they take effect.
+
+For example, Makefiles always use tab characters for indentation: you
+can overwrite "indent_style" property when current @code{major-mode} is
+a @code{makefile-mode} with following code:
+
+@verbatim
+(add-hook 'editorconfig-hack-properties-functions
+          '(lambda (props)
+             (when (derived-mode-p 'makefile-mode)
+               (puthash 'indent_style "tab" props))))
+@end verbatim
 
 @node editorconfig-indentation-alist
 @subsection @code{editorconfig-indentation-alist}
