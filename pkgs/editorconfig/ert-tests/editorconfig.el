@@ -1,5 +1,13 @@
 (require 'editorconfig)
 
+(defun display-warning (type message &optional level buffer-name)
+  "When testing overwrite this function to throw error when called."
+  (error "display-warning called: %S %S %S %S"
+         type
+         message
+         level
+         buffer-name))
+
 (defmacro with-visit-file (path &rest body)
   "Visit PATH and evaluate BODY."
   (declare (indent 1) (debug t))
@@ -49,22 +57,22 @@
   (editorconfig-mode 1)
 
   (with-visit-file (concat editorconfig-secondary-ert-dir
-                     "2_space.el")
+                           "2_space.el")
     (should (eq lisp-indent-offset 2)))
 
   (let ((editorconfig-lisp-use-default-indent t))
     (with-visit-file (concat editorconfig-secondary-ert-dir
-                       "2_space.el")
+                             "2_space.el")
       (should (eq lisp-indent-offset nil))))
 
   (let ((editorconfig-lisp-use-default-indent 2))
     (with-visit-file (concat editorconfig-secondary-ert-dir
-                       "2_space.el")
+                             "2_space.el")
       (should (eq lisp-indent-offset nil))))
 
   (let ((editorconfig-lisp-use-default-indent 4))
     (with-visit-file (concat editorconfig-secondary-ert-dir
-                       "2_space.el")
+                             "2_space.el")
       (should (eq lisp-indent-offset 2))))
   (editorconfig-mode -1))
 
@@ -79,4 +87,34 @@
     (read-only-mode 1)
     (should (not (memq 'delete-trailing-whitespace
                        write-file-functions))))
+  (editorconfig-mode -1))
+
+(ert-deftest test-file-type-emacs nil
+  (editorconfig-mode 1)
+  (with-visit-file (concat editorconfig-secondary-ert-dir
+                           "c.txt")
+    (should (eq major-mode 'conf-unix-mode)))
+  (editorconfig-mode -1))
+
+(ert-deftest test-file-type-ext nil
+  (editorconfig-mode 1)
+  (with-visit-file (concat editorconfig-secondary-ert-dir
+                           "a.txt")
+    (should (eq major-mode 'conf-unix-mode)))
+
+  (with-visit-file (concat editorconfig-secondary-ert-dir
+                           "bin/perlscript")
+    (should (eq major-mode 'perl-mode))
+    (should (eq perl-indent-level 5)))
+  (editorconfig-mode -1))
+
+(ert-deftest test-hack-properties-functions nil
+  (editorconfig-mode 1)
+  (add-hook 'editorconfig-hack-properties-functions
+            (lambda (props)
+              (puthash 'indent_size "5" props)))
+  (with-visit-file (concat editorconfig-ert-dir
+                           "4_space.py")
+    (should (eq python-indent-offset 5)))
+  (setq editorconfig-hack-properties-functions nil)
   (editorconfig-mode -1))

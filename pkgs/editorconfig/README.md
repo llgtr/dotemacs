@@ -1,34 +1,24 @@
 [![Build Status](https://travis-ci.org/editorconfig/editorconfig-emacs.svg?branch=master)](https://travis-ci.org/editorconfig/editorconfig-emacs)
-[![MELPA](http://melpa.org/packages/editorconfig-badge.svg)](http://melpa.org/#/editorconfig)
+[![MELPA](https://melpa.org/packages/editorconfig-badge.svg)](http://melpa.org/#/editorconfig)
 [![MELPA Stable](https://stable.melpa.org/packages/editorconfig-badge.svg)](https://stable.melpa.org/#/editorconfig)
 
 
 # EditorConfig Emacs Plugin
 
-This is an [EditorConfig][] plugin for [Emacs](https://www.gnu.org/software/emacs/).
+This is an [EditorConfig][] plugin for [Emacs][].
 
-## Installation
 
-Download the [EditorConfig C Core][] and follow the instructions in the README
-and INSTALL files to install it.
+## Setup
 
-This plugin also has a built-in core library implemented in Emacs-Lisp, and
-fallback to it when no core executable is found.
-
-In either case, copy `.el` files in this repository to `~/.emacs.d/lisp`
-and add the following to your `~/.emacs` file:
+This package is available from [MELPA][] and [MELPA Stable][].
+Install from there and enable global minor-mode `editorconfig-mode`:
 
 ```emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/lisp")
-(require 'editorconfig)
 (editorconfig-mode 1)
 ```
 
-Alternatively, you can find the package available on
-[MELPA](http://melpa.org/#/editorconfig) and [MELPA Stable](http://stable.melpa.org/#/editorconfig)
-([The Marmalade package](http://marmalade-repo.org/packages/editorconfig) is deprecated).
-
-Or if you use [**use-package**](https://www.emacswiki.org/emacs/UsePackage):
+If you use [**use-package**][use-package], add the following to your
+`init.el` file:
 
 ```emacs-lisp
 (use-package editorconfig
@@ -36,6 +26,30 @@ Or if you use [**use-package**](https://www.emacswiki.org/emacs/UsePackage):
   :config
   (editorconfig-mode 1))
 ```
+
+
+To install manually, copy all `.el` files in this repository to
+`~/.emacs.d/lisp` and add the following:
+
+```emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/lisp")
+(require 'editorconfig)
+(editorconfig-mode 1)
+```
+
+### Install a Core Program
+
+This package requires a Core program.
+The officially recommended one is [EditorConfig C Core][],
+follow the instructions in the README and INSTALL files to install it.
+
+Though using C Core is recommended, but this plugin also
+includes a core library implemented in Emacs Lisp.
+This plugin uses this as a fallback method when no core executable
+is found, so it works out-of-the-box without explicitly installing
+any other core program.
+
+
 
 ## Supported properties
 
@@ -53,6 +67,7 @@ Current Emacs plugin coverage for EditorConfig's [properties][]:
   we just buffer-locally override any preferences that would auto-add them
   to files `.editorconfig` marks as trailing-newline-free
 * `max_line_length`
+* `file_type_ext` (Experimental)
 * `file_type_emacs` (Experimental)
 * `root` (only used by EditorConfig core)
 
@@ -66,22 +81,40 @@ we might not yet cover some mode you use, but we try to add the
 ones that show up on our radar. Similarly, we don't yet hook
 in to all different packages for whitespace trimming to inform
 them about editorconfig settings, but aim for better coverage
-of things like [ws-trim](ftp://ftp.lysator.liu.se/pub/emacs/ws-trim.el).
+of things like
+[ws-trim](ftp://ftp.lysator.liu.se/pub/emacs/ws-trim.el).
 
-This plugin also has an experimental support for `file_type_emacs`,
-which specifies "file types" for files.
-As for Emacs, it means `major-mode` can be specified: for example,
-when `file_type_emacs` is set to `markdown` for `a.txt`,
-`markdown-mode` will be enabled when opening `a.txt`.
-This property is experimental and its meaning might change in
-the future updates.
+
+### File Type
+
+This plugin has experimental supports for `file_type_ext` and
+`file_type_emacs`, which specify "file types" for files.
+As for Emacs, it means `major-mode` can be set.
+
+**file_type_ext** When it is set to `md` for `a.txt`, for example,
+`major-mode` will be decided as if the file name would be `a.txt.md`
+(and thus `markdown-mode` is likely to be used).
+
+**file_type_emacs** When it is set to `markdown` for `a.txt`,
+`markdown-mode`  will be enabled when opening `a.txt`.
+
+These property are experimental and their meanings might change in the
+future updates. When both are specified, `file_type_ext` takes precedence.
 
 
 ## Customize
 
-### `editorconfig-custom-hooks`
+`editorconfig-emacs` provides some customize variables.
 
-A list of custom hooks after loading common EditorConfig settings, where you can
+Here are some of these variables: for the full list of available variables, 
+type <kbd>M-x customize-group [RET] editorconfig [RET]</kbd>.
+
+
+### `editorconfig-after-apply-functions`
+
+(Formerly `editorconfig-custom-hooks`)
+
+A list of functions after loading common EditorConfig settings, where you can
 set some custom variables or overwrite existing properties.
 
 For example, `web-mode` has several variables for indentation offset size and
@@ -89,11 +122,33 @@ EditorConfig sets them at once by `indent_size`. You may want to stop indenting
 only blocks of `web-mode`: it can be achieved by adding following to your init.el:
 
 ```emacs-lisp
-(add-hook 'editorconfig-custom-hooks
-  (lambda (hash) (setq web-mode-block-padding 0)))
+(add-hook 'editorconfig-after-apply-functions
+  (lambda (props) (setq web-mode-block-padding 0)))
 ```
 
 You can also define your own custom properties and enable them here.
+
+
+### `editorconfig-hack-properties-functions`
+
+A list of function to alter property values before applying them.
+
+These functions will be run after loading \".editorconfig\" files and before
+applying them to current buffer, so that you can alter some properties from
+\".editorconfig\" before they take effect.
+
+For example, Makefiles always use tab characters for indentation: you can
+overwrite \"indent_style\" property when current `major-mode` is a
+`makefile-mode` with following code:
+
+``` emacs-lisp
+(add-hook 'editorconfig-hack-properties-functions
+          '(lambda (props)
+             (when (derived-mode-p 'makefile-mode)
+               (puthash 'indent_style "tab" props))))
+
+```
+
 
 ### `editorconfig-indentation-alist`
 
@@ -108,53 +163,40 @@ add a pair of major-mode symbol and its indentation variables:
   '(c-mode c-basic-offset))
 ```
 
-You can also modify this variable with the command
-<kbd>M-x customize-variable [RET] editorconfig-indentation-alist [RET]</kbd>.
-For a bit more complicated cases please take a look at the docstring of this variable.
 
-### `editorconfig-exec-path`
+### `editorconfig-trim-whitespaces-mode`
 
-String of `editorconfig` executable name (command name or full path to
-the executable).
+Buffer local minor-mode to use to trim trailing whitespaces.
 
+If set, enable/disable that mode in accord with `trim_trailing_whitespace`
+property in `.editorconfig`.
+Otherwise, use Emacs built-in `delete-trailing-whitespace` function.
 
-### `editorconfig-get-properties-function`
-
-Function to use to get EditorConfig properties.
-
-For example, if you always want to use built-in core library instead
-of any EditorConfig executable to get properties, add following to
-your init.el:
+One possible value is
+[`ws-butler-mode`](https://github.com/lewang/ws-butler), with which
+only lines touched get trimmed. To use it, add following to your
+init.el:
 
 ``` emacs-lisp
-(set-variable 'editorconfig-get-properties-function
-              #'editorconfig-core-get-properties-hash)
+(setq editorconfig-trim-whitespaces-mode
+      'ws-butler-mode)
 ```
 
-Possible known values are:
-
-* `editorconfig-get-properties` (default)
-  * Use `editorconfig-get-properties-from-exec` when
-    `editorconfig-exec-path` executable is found, otherwise use
-    `editorconfig-core-get-properties-hash`
-* `editorconfig-get-properties-from-exec`
-  * Get properties by executing EditorConfig executable specified in
-    `editorconfig-exec-path`
-* `editorconfig-core-get-properties-hash`
-  * Always use built-in Emacs-Lisp implementation to get properties
-
-## Testing
-
-Make and [CMake](https://cmake.org) must be installed to run the tests.
-
-To run the tests:
-
-    $ make test
 
 ## Submitting Bugs and Feature Requests
 
 Bugs, feature requests, and other issues should be submitted to the issue
 tracker: https://github.com/editorconfig/editorconfig-emacs/issues
+
+
+### Development
+
+Make and [CMake][] must be installed to run the tests
+locally:
+
+    $ make test
+
+
 
 ## License
 
@@ -171,6 +213,13 @@ General Public License for more details.
 You should have received a copy of the GNU General Public License along
 with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-[EditorConfig]: http://editorconfig.org
+
+
+[Emacs]: https://www.gnu.org/software/emacs/
+[MELPA]: https://melpa.org/#/editorconfig
+[MELPA Stable]: https://stable.melpa.org/#/editorconfig
+[use-package]: https://www.emacswiki.org/emacs/UsePackage
+[EditorConfig]: https://editorconfig.org
 [EditorConfig C Core]: https://github.com/editorconfig/editorconfig-core-c
-[properties]: http://editorconfig.org/#supported-properties
+[properties]: https://editorconfig.org/#supported-properties
+[CMake]: https://cmake.org
