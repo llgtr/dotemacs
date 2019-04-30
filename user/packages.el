@@ -42,26 +42,6 @@
   :load-path "pkgs/async"
   :defer t)
 
-(use-package ghub
-  :load-path "pkgs/ghub"
-  :defer t)
-
-(use-package magit-popup
-  :load-path "pkgs/magit-popup"
-  :defer t)
-
-(use-package with-editor
-  :load-path "pkgs/with-editor"
-  :defer t)
-
-(use-package graphql
-  :load-path "pkgs/graphql"
-  :defer t)
-
-(use-package treepy
-  :load-path "pkgs/treepy"
-  :defer t)
-
 ;; Packages
 (use-package evil
   :load-path "pkgs/evil"
@@ -140,13 +120,5 @@
 (use-package ox-hugo
   :load-path "pkgs/ox-hugo"
   :after ox)
-
-(use-package magit
-  :load-path "pkgs/magit/lisp"
-  :commands magit-status)
-
-(use-package evil-magit
-  :load-path "pkgs/evil-magit"
-  :after magit)
 
 (provide 'packages)
