@@ -1,5 +1,3 @@
-;; Time-stamp: <2018-08-28 13:25:37 kmodi>
-
 ;; Setup to export Org files to Hugo-compatible Markdown using
 ;; `ox-hugo' in an "emacs -Q" environment.
 
@@ -7,10 +5,6 @@
 (setq-default require-final-newline t)
 (setq-default indent-tabs-mode nil)
 (setq-default make-backup-files nil)
-
-;; Force the locate to en_US for the tests.
-(set-locale-environment "en_US.UTF-8")
-(setenv "LANGUAGE" "en_US.UTF-8")
 
 ;; Toggle debug on error, including `user-error'.
 (setq debug-ignored-errors (remq 'user-error debug-ignored-errors))
@@ -33,17 +27,17 @@ minimum requirement for `ox-hugo'.  So set the environment
 variable OX_HUGO_DEFAULT_ORG to a value like 1 if using emacs 26
 or newer.")
 
-(defvar ox-hugo-elpa (let ((dir (getenv "OX_HUGO_ELPA")))
-                       (unless dir
-                         (setq dir
-                               (let* ((dir-1 (file-name-as-directory (expand-file-name user-login-name temporary-file-directory)))
-                                      (dir-2 (file-name-as-directory (expand-file-name "ox-hugo-dev" dir-1))))
-                                 dir-2)))
-                       (setq dir (file-name-as-directory dir))
-                       (make-directory dir :parents)
-                       dir))
+(defvar ox-hugo-tmp-dir (let ((dir (file-name-as-directory (getenv "OX_HUGO_TMP_DIR"))))
+                          (unless dir
+                            (setq dir
+                                  (let* ((dir-1 (file-name-as-directory (expand-file-name user-login-name temporary-file-directory)))
+                                         (dir-2 (file-name-as-directory (expand-file-name "ox-hugo-dev" dir-1))))
+                                    dir-2)))
+                          (setq dir (file-name-as-directory dir))
+                          (make-directory dir :parents)
+                          dir))
 (when ox-hugo-test-setup-verbose
-  (message "ox-hugo-elpa: %s" ox-hugo-elpa))
+  (message "ox-hugo-tmp-dir: %s" ox-hugo-tmp-dir))
 
 (defvar ox-hugo-packages '(toc-org))
 (when ox-hugo-install-org-from-elpa
@@ -63,6 +57,9 @@ or newer.")
   "Absolute path of the git root of the current project.")
 (when ox-hugo-test-setup-verbose
   (message "ox-hugo-site-git-root: %S" ox-hugo-site-git-root))
+
+(defvar ox-hugo-autoloads-file (expand-file-name "ox-hugo-autoloads.el" ox-hugo-site-git-root)
+  "Path to ox-hugo package's generated autoloads file.")
 
 ;; Below will prevent installation of `org' package as a dependency
 ;; when installing `ox-hugo' from Melpa.
@@ -88,34 +85,43 @@ even if they are found as dependencies."
 (advice-add 'package-compute-transaction :filter-return #'ox-hugo-package-dependency-check-ignore)
 ;; (advice-remove 'package-compute-transaction #'ox-hugo-package-dependency-check-ignore)
 
-(if (and (stringp ox-hugo-elpa)
-         (file-exists-p ox-hugo-elpa))
+(if (and (stringp ox-hugo-tmp-dir)
+         (file-exists-p ox-hugo-tmp-dir))
     (progn
       ;; Load newer version of .el and .elc if both are available
       (setq load-prefer-newer t)
 
-      (setq package-user-dir (format "%selpa_%s/" ox-hugo-elpa emacs-major-version))
+      (setq package-user-dir (format "%selpa_%s/" ox-hugo-tmp-dir emacs-major-version))
 
       ;; Below require will auto-create `package-user-dir' it doesn't exist.
       (require 'package)
+
+      ;; Even if we don't need to install Org from Elpa, we need to
+      ;; add Org Elpa in `package-archives' to prevent the "Package
+      ;; ‘org-9.0’ is unavailable" error.
+      ;;
+      ;; `setq' is used instead of `add-to-list' because we don't need
+      ;; the default GNU Elpa archive for this test.
+      (setq package-archives '(("org" . "https://orgmode.org/elpa/"))) ;For latest stable `org'
 
       (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
                           (not (gnutls-available-p))))
              (url (concat (if no-ssl "http" "https") "://melpa.org/packages/")))
         (add-to-list 'package-archives (cons "melpa" url))) ;For `toc-org'
 
-      ;; Even if we don't need to install Org from Elpa, we need to
-      ;; add Org Elpa in `package-archives' to prevent the "Package
-      ;; ‘org-9.0’ is unavailable" error.
-      (add-to-list 'package-archives '("org" . "https://orgmode.org/elpa/")) ;For latest stable `org'
+      ;; Generate/update and load the autoloads for ox-hugo.el and co.
+      (let ((generated-autoload-file ox-hugo-autoloads-file))
+        (update-directory-autoloads ox-hugo-site-git-root)
+        (load-file ox-hugo-autoloads-file))
 
       ;; Load emacs packages and activate them.
       ;; Don't delete this line.
       (package-initialize)
       ;; `package-initialize' call is required before any of the below
       ;; can happen.
+
       (add-to-list 'load-path (concat ox-hugo-site-git-root "doc/")) ;For ox-hugo-export-gh-doc.el
-      (add-to-list 'load-path ox-hugo-site-git-root) ;For ox-hugo.el, ox-blackfriday.el
+      (add-to-list 'load-path ox-hugo-site-git-root) ;For ox-hugo.el, ox-blackfriday.el, etc.
 
       (defvar ox-hugo-missing-packages '()
         "List populated at each startup that contains the list of packages that need
@@ -134,7 +140,7 @@ to be installed.")
           (message "Installing `%s' .." p)
           (package-install p))
         (setq ox-hugo-missing-packages '())))
-  (error "The environment variable OX_HUGO_ELPA needs to be set"))
+  (error "The environment variable OX_HUGO_TMP_DIR needs to be set"))
 
 ;; Remove Org that ships with Emacs from the `load-path' if installing
 ;; it from Elpa.
@@ -197,6 +203,10 @@ Emacs installation.  If Emacs is installed using
 
 (require 'ox-hugo-export-gh-doc)        ;For `ox-hugo-export-gh-doc'
 
+;; Allow setting few vars in Local Variables in the test files.
+(put 'org-hugo-auto-set-lastmod 'safe-local-variable 'booleanp)
+(put 'org-hugo-suppress-lastmod-period 'safe-local-variable 'floatp)
+
 (with-eval-after-load 'org
   ;; Allow multiple line Org emphasis markup
   ;; http://emacs.stackexchange.com/a/13828/115
@@ -226,16 +236,38 @@ Emacs installation.  If Emacs is installed using
     (setq org-confirm-babel-evaluate #'ox-hugo-org-confirm-babel-evaluate-fn))
 
   (with-eval-after-load 'ox
-    (setq org-export-headline-levels 4) ;default is 3
+    (setq org-export-headline-levels 4))) ;default is 3
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Settings *only* for tests (applied during "make test")
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(when (string= "1" (getenv "TEST_ENABLED"))
+  ;; Set the time-zone to UTC.
+  ;; If TZ is unset, Emacs uses system wall clock time, which is a
+  ;; platform-dependent default time zone --
+  ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Time-Zone-Rules.html
+  (setenv "TZ" "UTC")
+
+  ;; Force the locate to en_US for the tests.
+  (set-locale-environment "en_US.UTF-8")
+  (setenv "LANGUAGE" "en_US.UTF-8")
+
+  ;; Set all local variables from .dir-locals.el, etc.
+  (setq enable-local-variables :all)
+
+  ;; Override the default `org-hugo-export-creator-string' so that this
+  ;; string is consistent in all ox-hugo tests.
+  (setq org-hugo-export-creator-string "Emacs + Org mode + ox-hugo")
+
+  ;; Override the inbuilt `current-time' function so that the "lastmod"
+  ;; tests work.
+  (defun ox-hugo-test/current-time-override (&rest args)
+    "Hard-code the 'current time' so that the lastmod tests are reproducible.
+Fake current time: 2100/12/21 00:00:00 (arbitrary)."
+    (encode-time 0 0 0 21 12 2100))
+  (advice-add 'current-time :override #'ox-hugo-test/current-time-override)
+  ;; (advice-remove 'current-time #'ox-hugo-test/current-time-override)
+
+  (with-eval-after-load 'ox
     (add-to-list 'org-export-exclude-tags "dont_export_during_make_test")))
-
-;; Wed Sep 20 13:37:06 EDT 2017 - kmodi
-;; Below does not get applies when running emacs --batch.. need to
-;; figure out a solution.
-(custom-set-variables
- '(safe-local-variable-values
-   (quote
-    ((org-hugo-footer . "
-
-[//]: # \"Exported with love from a post written in Org mode\"
-[//]: # \"- https://github.com/kaushalmodi/ox-hugo\"")))))

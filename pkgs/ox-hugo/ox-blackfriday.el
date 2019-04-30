@@ -54,6 +54,11 @@ corner cases.
 
 Note that this variable is *only* for internal use.")
 
+(defvar org-blackfriday--org-element-string '((src-block . "Code Snippet")
+                                              (table . "Table")
+                                              (figure . "Figure")) ;Note that `figure' is not an actual Org element
+  "Alist of strings used to represent various Org elements.")
+
 
 
 ;;; User-Configurable Variables
@@ -293,6 +298,8 @@ Blackfriday happy.  So:
   \"\\)\" -> \"\\\\)\"
   \"\\\\=[\" -> \"\\\\\\=[\"
   \"\\\\=]\" -> \"\\\\\\=]\"
+  \"\\\\={\" -> \"\\\\\\={\"
+  \"\\\\=}\" -> \"\\\\\\=}\"
   \"\\|\" -> \"\\\\|\"
 
 and finally:
@@ -302,8 +309,8 @@ and finally:
          (escaped-str (replace-regexp-in-string "[_*]" "\\\\\\&" str))
          ;; (c) -> ( c), (r) -> ( r), (tm) -> ( tm)
          (escaped-str (replace-regexp-in-string "(\\(c\\|r\\|tm\\))" "( \\1)" escaped-str))
-         ;; \( -> \\(, \) -> \\), \[ -> \\[, \] -> \\], \| -> \\|
-         (escaped-str (replace-regexp-in-string "\\(\\\\[]()[|]\\)" "\\\\\\1" escaped-str))
+         ;; \( -> \\(, \) -> \\), \[ -> \\[, \] -> \\], \{ -> \\{, \} -> \\}, \| -> \\|
+         (escaped-str (replace-regexp-in-string "\\(\\\\[](){}[|]\\)" "\\\\\\1" escaped-str))
          (escaped-str (replace-regexp-in-string
                        "\\([^\\]\\)\\\\\\{2\\}[[:blank:]]*$" ;Replace "\\" at EOL with:
                        "\\1\\\\\\\\\\\\\\\\\\\\\\\\"             ;"\\\\\\"
@@ -385,7 +392,7 @@ style tag."
     ret))
 
 ;;;; Sanitize URL
-(defun org-blackfriday-url-sanitize (url)
+(defun org-blackfriday--url-sanitize (url)
   "Sanitize the URL by replace certain characters with their hex encoding.
 
 Replaces \"_\" with \"%5F\".
@@ -394,7 +401,7 @@ Workaround for Blackfriday bug https://github.com/russross/blackfriday/issues/27
   (replace-regexp-in-string "_" "%5F" url))
 
 ;;;; Blackfriday Issue 239 Workaround
-(defun org-blackfriday-issue-239-workaround (code parent-type)
+(defun org-blackfriday--issue-239-workaround (code parent-type)
   "Prefix Markdown list characters with zero width space.
 
 CODE is the content of the source or example block.  PARENT-TYPE
@@ -417,6 +424,80 @@ Details: https://github.com/kaushalmodi/ox-hugo/issues/57."
     ;;                            (after «"», but before «\\&"» above)
     ;; It's not visible (because zero width), but it's there.
     code))
+
+;;;; Get Reference
+(defun org-blackfriday--get-reference (elem)
+  "Return a reference for ELEM using its \"#+name\" if available.
+
+If the ELEM has its `name' defined, the anchor is derived from it:
+
+- If the `name' begins with \"code__\", \"tab__\", \"table__\",
+  \"fig__\" or \"figure__\", that prefix is removed as this
+  function adds its own appropriate prefix.
+- Underscores and forward slashes in the `name' get replaced with
+  hyphens.
+
+This conditioned `name' is then appended to the
+code/table/figure-appropriate prefix, and returned.
+
+Else, return nil.
+
+The return value, if non-nil, is a string."
+  (let ((name (org-element-property :name elem))) ;Value of #+name
+    ;; Reference cannot be created if #+name does not exist.
+    ;; (message "[ox-bf ref DBG] name: %S" name)
+    (when name
+      (let* ((elem-type (org-element-type elem))
+             (prefix (if (assoc elem-type org-blackfriday--org-element-string)
+                         (let ((type-str (cdr (assoc elem-type org-blackfriday--org-element-string))))
+                           (replace-regexp-in-string " " "-"
+                                                     (downcase type-str)))
+                       (format "org-%s" (symbol-name elem-type))))
+             (name1 (let* ((tmp name)
+                           ;; Remove commonly used code/table/figure
+                           ;; prefixes in the #+name itself.
+                           (tmp (replace-regexp-in-string "\\`\\(code\\|tab\\|table\\|fig\\|figure\\|\\)__" "" tmp))
+                           ;; Prefer to use hyphens instead of
+                           ;; underscores in anchors.  Also replace /
+                           ;; chars with hyphens.
+                           (tmp (replace-regexp-in-string "[_/]" "-" tmp)))
+                      tmp)))
+        (format "%s--%s" prefix name1)))))
+
+;;;; Translate
+(defun org-blackfriday--translate (type info &optional str)
+  "Return translated string for element TYPE to the lang set by \"#+language\".
+
+TYPE is the Org element type.
+
+INFO is a plist holding contextual information.
+
+If TYPE is `src-block' and if \"Listing\" translates to
+\"Listing\", translate the string associated with `src-block'
+from `org-blackfriday--org-element-string'.
+
+Else if TYPE key exists in `org-blackfriday--org-element-string',
+return the translated version of of the string associated in that
+alist.
+
+Else if TYPE key does not exist in
+`org-blackfriday--org-element-string', or if TYPE is nil, but STR
+is non-nil, return the translation of STR directly.
+
+Else return an empty string."
+  (let ((elem-str (cdr (assoc type org-blackfriday--org-element-string))))
+    (if elem-str
+        (cond
+         ((equal 'src-block type)
+          (let ((listing-tr (org-html--translate "Listing" info)))
+            (if (string= "Listing" listing-tr)
+                (org-html--translate elem-str info)
+              listing-tr)))
+         (t
+          (org-html--translate elem-str info)))
+      (if (stringp str)
+          (org-html--translate str info)
+        ""))))
 
 
 
@@ -442,7 +523,7 @@ information."
          ret)
     ;; (message "[ox-bf example-block DBG]")
     ;; (message "[ox-bf example-block DBG] parent type: %S" parent-type)
-    (setq ret (org-blackfriday-issue-239-workaround example parent-type))
+    (setq ret (org-blackfriday--issue-239-workaround example parent-type))
     (setq ret (format "%stext\n%s%s" backticks ret backticks))
     (setq ret (org-blackfriday--div-wrap-maybe example-block ret))
     (when (equal 'quote-block parent-type)
@@ -811,7 +892,7 @@ INFO is a plist used as a communication channel."
     ;; (message "[ox-bf src-block DBG]")
     ;; (message "ox-bf [dbg] code: %s" code)
     ;; (message "[ox-bf src-block DBG] parent type: %S" parent-type)
-    (setq code (org-blackfriday-issue-239-workaround code parent-type))
+    (setq code (org-blackfriday--issue-239-workaround code parent-type))
     (prog1
         (format "%s%s\n%s%s" backticks lang code backticks)
       (when (equal 'quote-block parent-type)
@@ -936,16 +1017,15 @@ contextual information."
   ;; (message "[ox-bf-table DBG] In contents: %s" contents)
   (let* ((rows (org-element-map table 'table-row 'identity info))
          (no-header (= (length rows) 1)) ;No header if table has just 1 row
-         (label (let ((lbl (and (org-element-property :name table)
-                                (org-export-get-reference table info))))
-                  (if lbl
-                      (format "<a id=\"%s\"></a>\n\n" lbl)
-                    "")))
+         (table-ref (org-blackfriday--get-reference table))
+         (table-anchor (if table-ref
+                           (format "<a id=\"%s\"></a>\n" table-ref)
+                         ""))
          (caption (org-export-get-caption table))
          table-num
          (caption-html (if (not caption)
                            ""
-                         (let ((caption-prefix-fmt-str (org-html--translate "Table %d:" info))
+                         (let ((caption-prefix (org-blackfriday--translate 'table info))
                                (caption-str
                                 (org-html-convert-special-strings ;Interpret em-dash, en-dash, etc.
                                  (org-export-data-with-backend caption 'html info))))
@@ -953,10 +1033,14 @@ contextual information."
                                             table info
                                             nil #'org-html--has-caption-p))
                            (format (concat "<div class=\"table-caption\">\n"
-                                           "  <span class=\"table-number\">%s</span>\n"
+                                           "  <span class=\"table-number\">%s</span>:\n"
                                            "  %s\n"
                                            "</div>\n\n")
-                                   (format caption-prefix-fmt-str table-num)
+                                   (if table-ref ;Hyperlink the table prefix + number
+                                       (format "<a href=\"#%s\">%s %s</a>"
+                                               table-ref caption-prefix table-num)
+                                     (format "%s %s"
+                                             caption-prefix table-num))
                                    caption-str))))
          (attr (org-export-read-attribute :attr_html table))
          ;; At the moment only the `class' attribute is supported in
@@ -1011,7 +1095,7 @@ contextual information."
              (dummy-header (replace-regexp-in-string "[-:]" " " hrule)))
         (setq tbl (concat dummy-header "\n" hrule "\n" row-1))))
     ;; (message "[ox-bf-table DBG] Tbl:\n%s" tbl)
-    (concat table-pre label caption-html tbl table-post)))
+    (concat table-pre table-anchor caption-html tbl table-post)))
 
 ;;;; Verse Block
 (defun org-blackfriday-verse-block (_verse-block contents info)
