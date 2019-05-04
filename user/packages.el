@@ -70,7 +70,11 @@
    counsel-describe-function
    counsel-describe-face
    counsel-git-grep
-   counsel-ag))
+   counsel-ag
+   counsel-rg)
+  :config
+  (setq counsel-ag-base-command "ag --nocolor --nogroup --width 200 %s")
+  (setq counsel-rg-base-command "rg -i -M 200 --no-heading --line-number --color never %s ."))
 
 (use-package avy
   :load-path "pkgs/avy"
