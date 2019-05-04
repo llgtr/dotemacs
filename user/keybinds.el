@@ -78,6 +78,7 @@
    "pd" 'projectile-dired
    "pf" 'projectile-find-file
    "pr" 'projectile-recentf
+   "pR" 'projectile-replace
    "pp" 'projectile-switch-project
    "pk" 'projectile-kill-buffers
 
@@ -89,6 +90,7 @@
    ;; Search
    "s" '(:ignore t :wk "Registers")
    "sa" 'counsel-ag
+   "sr" 'counsel-rg
    "sg" 'counsel-git-grep
 
    ;; Toggles
@@ -108,77 +110,75 @@
    "wD" 'delete-other-windows
    "ws" 'ace-swap-window
 
-  ;; Quit
-  "q" '(:ignore t :wk "Quit")
-  "qq" 'evil-quit
-  "qQ" 'evil-quit-all)
+   ;; Quit
+   "q" '(:ignore t :wk "Quit")
+   "qq" 'evil-quit
+   "qQ" 'evil-quit-all)
 
   ;; Org-mode
   (general-define-key
-    :states '(normal visual)
-    :prefix main-major-mode-leader-key
-    :keymaps 'org-mode-map
+   :states '(normal visual)
+   :prefix main-major-mode-leader-key
+   :keymaps 'org-mode-map
 
-    "." 'org-time-stamp
-    "," 'org-priority
-    ";" 'org-toggle-comment
-    "<" 'org-date-from-calendar
-    "d" 'org-deadline
-    "e" 'org-export-dispatch
-    "l" 'org-insert-link
-    "s" 'org-schedule
-    "T" 'org-todo
-    "#" 'org-update-statistics-cookies
-    "i" 'org-clock-in
-    "o" 'org-clock-out
-    "r" 'org-clock-report
-    "b" 'org-toggle-checkbox
+   "." 'org-time-stamp
+   "," 'org-priority
+   ";" 'org-toggle-comment
+   "<" 'org-date-from-calendar
+   "d" 'org-deadline
+   "e" 'org-export-dispatch
+   "l" 'org-insert-link
+   "s" 'org-schedule
+   "T" 'org-todo
+   "#" 'org-update-statistics-cookies
+   "i" 'org-clock-in
+   "o" 'org-clock-out
+   "r" 'org-clock-report
+   "b" 'org-toggle-checkbox
 
-    ; Tables
-    "tc" 'org-table-create-or-convert-from-region
-    "tk" 'org-table-move-row-up
-    "tj" 'org-table-move-row-down
-    "th" 'org-table-move-column-left
-    "tl" 'org-table-move-column-right
-    "tir" 'org-table-insert-row
-    "tic" 'org-table-insert-column
-    "tdr" 'org-table-kill-row
-    "tdc" 'org-table-delete-column
-    )
+   ;; Tables
+   "tc" 'org-table-create-or-convert-from-region
+   "tk" 'org-table-move-row-up
+   "tj" 'org-table-move-row-down
+   "th" 'org-table-move-column-left
+   "tl" 'org-table-move-column-right
+   "tir" 'org-table-insert-row
+   "tic" 'org-table-insert-column
+   "tdr" 'org-table-kill-row
+   "tdc" 'org-table-delete-column)
 
   ;; Clojure(script)-mode
   (general-define-key
-    :states '(normal visual)
-    :prefix main-major-mode-leader-key
-    :keymaps 'clojure-mode-map
+   :states '(normal visual)
+   :prefix main-major-mode-leader-key
+   :keymaps 'clojure-mode-map
 
-    "c" 'cider-jack-in
-    ; TODO: cider bindings
-    )
+   "c" 'cider-jack-in
+   ;; TODO: cider bindings
+   )
 
   ;; Editable dired
   (general-define-key
-    :states '(normal visual)
-    :prefix main-major-mode-leader-key
-    :keymaps 'wdired-mode-map
+   :states '(normal visual)
+   :prefix main-major-mode-leader-key
+   :keymaps 'wdired-mode-map
 
-    "s" 'wdired-finish-edit)
+   "s" 'wdired-finish-edit)
 
   ;; Web-mode
   (general-define-key
-    :states '(normal visual)
-    :prefix main-major-mode-leader-key
-    :keymaps 'web-mode-map
+   :states '(normal visual)
+   :prefix main-major-mode-leader-key
+   :keymaps 'web-mode-map
 
-    "f" 'web-mode-fold-or-unfold
-    "w" 'web-mode-whitespaces-show
-    "r" 'web-mode-reload
-    "i" 'web-mode-buffer-indent
-    "ei" 'web-mode-element-insert
-    "ek" 'web-mode-element-kill
-    "en" 'web-mode-element-next
-    "ep" 'web-mode-element-previous
-    "ec" 'web-mode-element-close)
-  )
+   "f" 'web-mode-fold-or-unfold
+   "w" 'web-mode-whitespaces-show
+   "r" 'web-mode-reload
+   "i" 'web-mode-buffer-indent
+   "ei" 'web-mode-element-insert
+   "ek" 'web-mode-element-kill
+   "en" 'web-mode-element-next
+   "ep" 'web-mode-element-previous
+   "ec" 'web-mode-element-close))
 
 (provide 'keybinds)
