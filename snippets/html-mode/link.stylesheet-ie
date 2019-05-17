@@ -1,6 +1,0 @@
-#contributor : Jimmy Wu <frozenthrone88@gmail.com> (edited)
-#name : <!--[if IE]><link stylesheet="..." /><![endif]-->
-# --
-<!--[if IE]>
-<link rel="stylesheet" href="${2:url}" />
-<![endif]-->
