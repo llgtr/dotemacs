@@ -20,6 +20,7 @@
    "&" 'async-shell-command
    "?" 'emacs-init-time
    "0" 'text-scale-adjust
+   ":" 'eval-expression
 
    ;; Applications
    "a" '(:ignore t :wk "Applications")
