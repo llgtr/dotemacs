@@ -38,6 +38,10 @@
   :load-path "lib/s"
   :defer t)
 
+(use-package popup
+  :load-path "lib/popup"
+  :defer t)
+
 ;; Packages
 (use-package evil
   :load-path "pkgs/evil"
@@ -109,5 +113,13 @@
 (use-package ox-hugo
   :load-path "pkgs/ox-hugo"
   :after ox)
+
+(use-package dumb-jump
+  :load-path "pkgs/dumb-jump"
+  :defer t
+  :commands (dumb-jump-go dumb-jump-back dumb-jump-quick-look)
+  :config
+  (setq dumb-jump-selector 'ivy)
+  (setq dumb-jump-force-searcher 'rg))
 
 (provide 'packages)

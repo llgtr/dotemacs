@@ -71,6 +71,9 @@
    "jc" 'evil-avy-goto-char
    "jw" 'evil-avy-goto-word-1
    "jl" 'evil-avy-goto-line
+   "jd" 'dumb-jump-go
+   "jb" 'dumb-jump-back
+   "jq" 'dumb-jump-quick-look
 
    ;; Projectile / project
    "p" '(:ignore t :wk "Project")
