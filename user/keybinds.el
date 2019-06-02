@@ -45,6 +45,7 @@
    "e" '(:ignore t :wk "Errors")
    "en" 'next-error
    "ep" 'previous-error
+   "el" 'flycheck-list-errors
 
    ;; Files
    "f" '(:ignore t :wk "Files")
