@@ -4,7 +4,9 @@
 (use-package flycheck
   :load-path "pkgs/flycheck"
   :commands flycheck-mode
-  :init (setq flycheck-mode-line-prefix "F"))
+  :init (setq flycheck-mode-line-prefix "F")
+  :config
+  (flycheck-add-mode 'javascript-eslint 'web-mode))
 
 ;; Rust
 (use-package rust-mode
@@ -60,6 +62,7 @@
   ("\\.js[x]?\\'" . web-mode)
   ("\\.ts[x]?\\'" . web-mode)
   ("\\.json?\\'" . web-mode)
+  :hook (web-mode . flycheck-mode)
   :config
   (add-to-list 'web-mode-indentation-params '("lineup-args" . nil))
   (add-to-list 'web-mode-indentation-params '("lineup-calls" . nil))
@@ -67,8 +70,7 @@
   (add-to-list 'web-mode-indentation-params '("lineup-ternary" . nil))
   (setq web-mode-enable-auto-quoting nil)
   (setq web-mode-content-types-alist
-    '(("jsx" . "/\\(rn\\|component\\)[s]?/.*\\.js[x]?\\'")))
-  )
+    '(("jsx" . "/\\(rn\\|component\\)[s]?/.*\\.js[x]?\\'"))))
 
 ;; Markdown
 (use-package markdown-mode
