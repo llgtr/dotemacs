@@ -38,10 +38,6 @@
   :load-path "pkgs/s"
   :defer t)
 
-(use-package async
-  :load-path "pkgs/async"
-  :defer t)
-
 ;; Packages
 (use-package evil
   :load-path "pkgs/evil"
