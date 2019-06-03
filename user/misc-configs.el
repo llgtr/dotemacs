@@ -56,6 +56,9 @@
 ;; Start in fullscreen mode
 (custom-set-variables '(initial-frame-alist '((fullscreen . maximized))))
 
+;; Prompt y/n instead of yes/no
+(defalias 'yes-or-no-p 'y-or-n-p)
+
 ;; MacOS things
 (when (eq system-type 'darwin)
   (setq mac-option-key-is-meta t)
