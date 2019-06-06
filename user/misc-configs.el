@@ -1,22 +1,24 @@
 ;;; -*- lexical-binding: t -*-
 
-;; Scroll like vim
-(setq scroll-margin 10
-      scroll-conservatively 10000
-      scroll-step 1)
-
-;; Indent with spaces rather than tabs by default
-(setq-default indent-tabs-mode nil)
-
-;; Follow symlinked files without confirmation
-(setq vc-follow-symlinks t)
-
-;; Whitespace mode config
-(setq whitespace-style '(face tabs newline trailing lines))
+;; Set defaults
+(setq-default
+ ;; Scroll like vim
+ scroll-margin 10
+ scroll-conservatively 10000
+ scroll-step 1
+ ;; Indent with spaces rather than tabs by default
+ indent-tabs-mode nil
+ ;; Follow symlinked files without confirmation
+ vc-follow-symlinks t
+ ;; Whitespace mode config
+ whitespace-style '(face tabs newline trailing lines)
+ ;; Recentf
+ recentf-max-menu-items 25
+ ;; Truncate instead of wrapping
+ truncate-lines t)
 
 ;; Recent files
 (recentf-mode)
-(setq recentf-max-menu-items 25)
 
 ;; Better backup configurations
 ;; (Be careful with this if editing sensitive files via emacs)
